@@ -1,0 +1,1 @@
+A pasta api deve-se chamar backend, mas por algum motivo chama-se api (o meu cliente pediu-me).
