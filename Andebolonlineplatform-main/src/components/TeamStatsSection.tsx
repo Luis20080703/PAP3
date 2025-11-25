@@ -7,13 +7,13 @@ import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export function TeamStatsSection() {
-  const { user, teamStats, statsLoading } = useApp();
+  const { user, estatisticasEquipas, estatisticasCarregando } = useApp();
   const [selectedDivision, setSelectedDivision] = useState<string>('seniores');
 
   if (!user) return null;
 
-  const filteredStats = teamStats.filter(
-    stats => stats.division === selectedDivision
+  const filteredStats = estatisticasEquipas.filter(
+    stats => stats.divisao === selectedDivision
   );
 
   const calculateAverage = (total: number, matches: number) => {
@@ -47,7 +47,7 @@ export function TeamStatsSection() {
         </TabsList>
 
         <TabsContent value={selectedDivision} className="mt-6">
-          {statsLoading ? (
+          {estatisticasCarregando ? (
             <div className="flex justify-center items-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
             </div>
@@ -65,7 +65,7 @@ export function TeamStatsSection() {
               <CardHeader>
                 <CardDescription>Total de Jogos</CardDescription>
                 <CardTitle>
-                  {filteredStats.reduce((sum, team) => sum + team.matchesPlayed, 0)}
+                  {filteredStats.reduce((sum, team) => sum + (team.jogosDisputados || 0), 0)}
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -73,7 +73,7 @@ export function TeamStatsSection() {
               <CardHeader>
                 <CardDescription>Golos Marcados (Total)</CardDescription>
                 <CardTitle>
-                  {filteredStats.reduce((sum, team) => sum + team.goalsScored, 0)}
+                  {filteredStats.reduce((sum, team) => sum + (team.golosMarcados || 0), 0)}
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -109,17 +109,17 @@ export function TeamStatsSection() {
                   <TableBody>
                     {filteredStats
                       .sort((a, b) => {
-                        const pointsA = a.wins * 2 + a.draws;
-                        const pointsB = b.wins * 2 + b.draws;
+                        const pointsA = (a.vitorias || 0) * 2 + (a.empates || 0);
+                        const pointsB = (b.vitorias || 0) * 2 + (b.empates || 0);
                         if (pointsB !== pointsA) return pointsB - pointsA;
-                        return (b.goalsScored - b.goalsConceded) - (a.goalsScored - a.goalsConceded);
+                        return ((b.golosMarcados || 0) - (b.golosSofridos || 0)) - ((a.golosMarcados || 0) - (a.golosSofridos || 0));
                       })
                       .map((team, index) => {
-                        const points = team.wins * 2 + team.draws;
-                        const goalDiff = team.goalsScored - team.goalsConceded;
-                        const avgScored = calculateAverage(team.goalsScored, team.matchesPlayed);
-                        const avgConceded = calculateAverage(team.goalsConceded, team.matchesPlayed);
-                        const isUserTeam = team.teamName === user.team;
+                        const points = (team.vitorias || 0) * 2 + (team.empates || 0);
+                        const goalDiff = (team.golosMarcados || 0) - (team.golosSofridos || 0);
+                        const avgScored = calculateAverage(team.golosMarcados || 0, team.jogosDisputados || 1);
+                        const avgConceded = calculateAverage(team.golosSofridos || 0, team.jogosDisputados || 1);
+                        const isUserTeam = team.nomeEquipa === user.equipa;
 
                         return (
                           <TableRow key={team.id} className={isUserTeam ? 'bg-blue-50' : ''}>
@@ -129,13 +129,13 @@ export function TeamStatsSection() {
                               )}
                               {index + 1}º
                             </TableCell>
-                            <TableCell>{team.teamName}</TableCell>
-                            <TableCell className="text-center">{team.matchesPlayed}</TableCell>
-                            <TableCell className="text-center">{team.wins}</TableCell>
-                            <TableCell className="text-center">{team.draws}</TableCell>
-                            <TableCell className="text-center">{team.losses}</TableCell>
-                            <TableCell className="text-center">{team.goalsScored}</TableCell>
-                            <TableCell className="text-center">{team.goalsConceded}</TableCell>
+                            <TableCell>{team.nomeEquipa}</TableCell>
+                            <TableCell className="text-center">{team.jogosDisputados}</TableCell>
+                            <TableCell className="text-center">{team.vitorias}</TableCell>
+                            <TableCell className="text-center">{team.empates}</TableCell>
+                            <TableCell className="text-center">{team.derrotas}</TableCell>
+                            <TableCell className="text-center">{team.golosMarcados}</TableCell>
+                            <TableCell className="text-center">{team.golosSofridos}</TableCell>
                             <TableCell className="text-center">
                               <div className="flex items-center justify-center gap-1">
                                 {goalDiff > 0 ? (
