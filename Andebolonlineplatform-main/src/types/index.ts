@@ -1,4 +1,4 @@
-export type UserType = 'atleta' | 'treinador';
+export type UserType = 'atleta' | 'treinador' | 'root' | 'admin';
 
 // Tabela: users
 export interface User {
@@ -8,6 +8,9 @@ export interface User {
   password: string;
   tipo: UserType;
   equipa: string;
+  validado?: boolean; // ✅ Só para treinadores
+  is_premium?: boolean; // ✅ Estatuto Pro
+  premium_plan?: 'pro' | 'elite'; // ✅ Differentiate plan tiers
 }
 
 // Tabela: épocas
@@ -59,7 +62,7 @@ export interface Play {
   data_upload: Date;
   // Campos derivados para exibição
   autorNome?: string;
-  autorTipo?: 'atleta' | 'treinador'; // ✅ CORRIGIDO
+  autorTipo?: UserType; // ✅ CORRIGIDO
   equipa?: string;
   categoria?: string;
   comentarios?: Comment[];
@@ -74,7 +77,18 @@ export interface Comment {
   data: Date;
   // Campos derivados para exibição
   autorNome?: string;
-  autorTipo?: 'atleta' | 'treinador'; // ✅ CORRIGIDO
+  autorTipo?: UserType; // ✅ CORRIGIDO
+}
+export interface AthleteStatsDisplay {
+  id: string;
+  nome: string;
+  equipa: string;
+  posicao: 'pivot' | 'ponta' | 'lateral' | 'central' | 'guarda-redes';
+  divisao: 'seniores' | 'sub-20' | 'sub-18' | 'sub-16' | 'sub-14';
+  golosMarcados: number;
+  jogosDisputados: number;
+  cartoesAmarelos: number;
+  cartoesVermelhos: number;
 }
 
 // Tabela: dicas
@@ -89,7 +103,7 @@ export interface Tip {
   categoria?: 'finta' | 'drible' | 'remate' | 'defesa' | 'táctica';
   descricao?: string;
   autorNome?: string;
-  autorTipo?: 'atleta' | 'treinador'; // ✅ CORRIGIDO
+  autorTipo?: UserType; // ✅ CORRIGIDO
 }
 
 // Tabela: estatísticas_equipas
@@ -117,10 +131,11 @@ export interface AthleteStats {
   epoca: string;
   media_golos: number;
   // Campos adicionais necessários
-  assistencias?: number;
+
   cartoesAmarelos?: number;
   cartoesVermelhos?: number;
   jogosDisputados?: number;
+  doisMinutos: number; // total de minutos de exclusão de 2'
   // Campos derivados para exibição
   nome?: string;
   equipa?: string;
@@ -136,7 +151,7 @@ export interface PlayDisplay {
   urlVideo: string; // ✅ CORRIGIDO
   autorId: string; // ✅ CORRIGIDO
   autorNome: string; // ✅ CORRIGIDO
-  autorTipo: 'atleta' | 'treinador'; // ✅ CORRIGIDO
+  autorTipo: UserType; // ✅ CORRIGIDO
   equipa: string; // ✅ CORRIGIDO
   categoria: string;
   criadoEm: Date; // ✅ CORRIGIDO
@@ -148,7 +163,7 @@ export interface CommentDisplay {
   jogadaId: string; // ✅ CORRIGIDO
   autorId: string; // ✅ CORRIGIDO
   autorNome: string; // ✅ CORRIGIDO
-  autorTipo: 'atleta' | 'treinador'; // ✅ CORRIGIDO
+  autorTipo: UserType; // ✅ CORRIGIDO
   conteudo: string; // ✅ CORRIGIDO
   criadoEm: Date; // ✅ CORRIGIDO
 }
@@ -161,8 +176,10 @@ export interface TipDisplay {
   conteudo: string; // ✅ CORRIGIDO
   autorId: string; // ✅ CORRIGIDO
   autorNome: string; // ✅ CORRIGIDO
-  autorTipo: 'atleta' | 'treinador'; // ✅ CORRIGIDO
+  autorTipo: UserType; // ✅ CORRIGIDO
+  equipa: string; // ✅ ADICIONADO
   criadoEm: Date; // ✅ CORRIGIDO
+  equipaNome?: string;
 }
 
 export interface TeamStatsDisplay {
@@ -185,7 +202,7 @@ export interface AthleteStatsDisplay {
   divisao: 'seniores' | 'sub-20' | 'sub-18' | 'sub-16' | 'sub-14';
   golosMarcados: number; // ✅ CORRIGIDO
   jogosDisputados: number; // ✅ CORRIGIDO
-  assistencias: number; // ✅ CORRIGIDO
   cartoesAmarelos: number; // ✅ CORRIGIDO
   cartoesVermelhos: number; // ✅ CORRIGIDO
+  doisMinutos: number; // total de minutos de exclusão de 2'
 }

@@ -28,7 +28,6 @@ class EquipaController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
-            'escalao_equipa_escalao' => 'nullable|string|max:255'
         ]);
 
         $equipa = Equipa::create($validated);
@@ -76,7 +75,6 @@ class EquipaController extends Controller
 
         $validated = $request->validate([
             'nome' => 'sometimes|string|max:255',
-            'escalao_equipa_escalao' => 'nullable|string|max:255'
         ]);
 
         $equipa->update($validated);

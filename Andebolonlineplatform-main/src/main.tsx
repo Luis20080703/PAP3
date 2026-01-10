@@ -1,7 +1,15 @@
 
-  import { createRoot } from "react-dom/client";
-  import App from "./App.tsx";
-  import "./index.css";
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+import { registerSW } from 'virtual:pwa-register';
 
-  createRoot(document.getElementById("root")!).render(<App />);
-  
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm('Nova versão disponível. Atualizar?')) {
+      updateSW(true);
+    }
+  },
+});
+
+createRoot(document.getElementById("root")!).render(<App />);

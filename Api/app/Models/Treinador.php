@@ -12,7 +12,9 @@ class Treinador extends Model
     protected $fillable = [
         'user_id',
         'equipa_id',
-        'epoca_id'
+        'epoca_id',
+        'validado',
+        'escalao'
     ];
 
     // ==================== RELAÇÕES ====================

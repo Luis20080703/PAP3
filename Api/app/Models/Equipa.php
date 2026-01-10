@@ -9,7 +9,7 @@ class Equipa extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'escalao_equipa_escalao'];
+    protected $fillable = ['nome'];
 
     // ==================== RELAÇÕES ====================
 

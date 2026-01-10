@@ -12,33 +12,75 @@ class JogadaController extends Controller
 {
     public function index(): JsonResponse
     {
-        // ✅ SOLUÇÃO TEMPORÁRIA: Mostrar TODAS as jogadas
-        $jogadas = Jogada::with(['equipa', 'user', 'comentarios'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $user = $this->getAuthenticatedUser();
+        
+        // Se for admin ou root, vê tudo
+        if ($user && in_array($user->tipo, ['admin', 'root'])) {
+             $jogadas = Jogada::with(['equipa', 'user', 'comentarios'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+             // Se for atleta/treinador, vê apenas da sua equipa + públicas (se houver conceito de públicas)
+             // Neste caso assumimos que vê apenas da sua equipa
+             $equipaId = null;
+             
+             // Tentar obter equipa_id do user ( assumindo que user tem equipa pelo nome ou relação direta )
+             // Como a BD usa nomes nos users mas IDs nas jogadas, precisamos resolver isso.
+             // O ideal era o user ter equipa_id, mas vamos buscar pelo nome
+             
+             if ($user && $user->equipa) {
+                 $equipa = \App\Models\Equipa::where('nome', $user->equipa)->first();
+                 $equipaId = $equipa ? $equipa->id : null;
+             }
+             
+             if ($equipaId) {
+                 $jogadas = Jogada::with(['equipa', 'user', 'comentarios'])
+                    ->where('equipa_id', $equipaId)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+             } else {
+                 $jogadas = []; // Sem equipa, sem jogadas
+             }
+        }
 
         return response()->json(['success' => true, 'data' => $jogadas]);
     }
 
     public function store(Request $request): JsonResponse
     {
-        // ✅ DEBUG: Ver o que está a chegar
         \Log::info('📥 DADOS RECEBIDOS NA JOGADA:', $request->all());
 
-        // ✅ VALIDAÇÃO COMPLETA com TODOS os campos
+        // ✅ VALIDAÇÃO PARA UPLOAD DE FICHEIROS
         $validated = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',      // ✅ ADICIONAR
-            'equipa_id' => 'required|exists:equipas,id',
+            'user_id' => 'required|integer|exists:users,id',
+            'equipa_id' => 'required|integer|exists:equipas,id',
             'titulo' => 'required|string|max:255',
             'descricao' => 'required|string',
-            'ficheiro' => 'required|string',                      // ✅ MUDAR para required
-            'data_upload' => 'required|date'                      // ✅ ADICIONAR
+            'video' => 'nullable|file|mimes:mp4,avi,mov,wmv|max:50000', // 50MB max
+            'ficheiro' => 'nullable|string'
         ]);
 
         \Log::info('✅ DADOS VALIDADOS:', $validated);
 
-        // ✅ CRIAR JOGADA com TODOS os dados
-        $jogada = Jogada::create($validated);
+        $videoPath = null;
+        
+        // ✅ PROCESSAR UPLOAD DE VÍDEO
+        if ($request->hasFile('video')) {
+            $video = $request->file('video');
+            $videoName = time() . '_' . $video->getClientOriginalName();
+            $videoPath = $video->storeAs('videos', $videoName, 'public');
+            \Log::info('📹 VÍDEO GUARDADO:', ['path' => $videoPath]);
+        }
+
+        // ✅ CRIAR JOGADA
+        $jogada = Jogada::create([
+            'user_id' => $validated['user_id'],
+            'equipa_id' => $validated['equipa_id'],
+            'titulo' => $validated['titulo'],
+            'descricao' => $validated['descricao'],
+            'ficheiro' => $videoPath ?? $validated['ficheiro'] ?? 'default.mp4',
+            'data_upload' => now()
+        ]);
 
         \Log::info('🎯 JOGADA CRIADA:', $jogada->toArray());
 
@@ -121,7 +163,17 @@ class JogadaController extends Controller
                 'user_id' => $jogada->user_id
             ]);
 
-            // ✅ PERMITIR A TODOS TEMPORARIAMENTE
+            $user = $this->getAuthenticatedUser();
+
+            // ✅ VERIFICAÇÃO DE PERMISSÕES RESTAURADA
+            if (!$this->podeApagarJogada($jogada, $user)) {
+                 \Log::warning('⛔ [DELETE ACCESS DENIED]', ['user' => $user->id, 'jogada' => $id]);
+                 return response()->json([
+                     'success' => false,
+                     'message' => 'Não tem permissão para apagar esta jogada'
+                 ], 403);
+            }
+
             $jogada->delete();
 
             \Log::info('🎉 [DELETE COMPLETE] Jogada apagada com sucesso');
@@ -151,7 +203,9 @@ class JogadaController extends Controller
         \Log::info('🔐 [ACL DEBUG] Verificando permissões:', [
             'user_id' => $user->id,
             'user_tipo' => $user->tipo,
+            'user_equipa' => $user->equipa,
             'jogada_user_id' => $jogada->user_id,
+            'jogada_equipa_id' => $jogada->equipa_id,
             'jogada_id' => $jogada->id
         ]);
 
@@ -160,16 +214,29 @@ class JogadaController extends Controller
             return false;
         }
 
-        // Regra 1: Dono da jogada
-        if ($jogada->user_id == $user->id) { // ← USA == EM VEZ DE ===
+        // Regra 1: Admin pode apagar qualquer jogada
+        if ($user->tipo === 'admin') {
+            \Log::info('✅ [ACL] É admin - pode apagar tudo');
+            return true;
+        }
+
+        // Regra 2: Dono da jogada
+        if ($jogada->user_id == $user->id) {
             \Log::info('✅ [ACL] É dono da jogada');
             return true;
         }
 
-        // Regra 2: Treinador (pode apagar qualquer jogada da equipa)
+        // Regra 3: Treinador só pode apagar jogadas da sua equipa
         if ($user->tipo === 'treinador') {
-            \Log::info('✅ [ACL] É treinador');
-            return true;
+            // Verificar se a jogada é da mesma equipa do treinador
+            $jogadaEquipa = $jogada->equipa;
+            if ($jogadaEquipa && $jogadaEquipa->nome === $user->equipa) {
+                \Log::info('✅ [ACL] Treinador da mesma equipa');
+                return true;
+            } else {
+                \Log::info('❌ [ACL] Treinador de equipa diferente');
+                return false;
+            }
         }
 
         \Log::info('❌ [ACL] Sem permissões');

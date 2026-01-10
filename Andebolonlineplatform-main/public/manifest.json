@@ -1,0 +1,39 @@
+{
+    "name": "NexusHand - Plataforma de Andebol",
+    "short_name": "NexusHand",
+    "description": "Plataforma profissional para gestão e visualização de jogadas, dicas e estatísticas de andebol",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563eb",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/pwa-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/pwa-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "categories": [
+        "sports",
+        "education",
+        "productivity"
+    ],
+    "lang": "pt-PT",
+    "dir": "ltr",
+    "scope": "/",
+    "prefer_related_applications": false
+}

@@ -4,10 +4,15 @@ import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 import { Toaster } from './components/ui/sonner';
 import { AppProvider, useApp } from './context/AppContext';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { BubbleCursor } from './components/BubbleCursor';
+import { ServerConfig } from './components/ServerConfig';
+
+import { PremiumPage } from './components/PremiumPage';
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
-  const { user, loading, logout: apiLogout } = useApp();
+  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard' | 'premium'>('home');
+  const { user, carregando, logout: apiLogout } = useApp();
 
   // Set document title
   useEffect(() => {
@@ -16,7 +21,7 @@ function AppContent() {
 
   // Check if user is logged in on mount
   useEffect(() => {
-    if (user) {
+    if (user && currentPage !== 'premium') { // Evita overwrite se já estiver em premium (navegação interna)
       setCurrentPage('dashboard');
     }
   }, [user]);
@@ -26,7 +31,7 @@ function AppContent() {
     setCurrentPage('home');
   };
 
-  if (loading) {
+  if (carregando) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -37,6 +42,7 @@ function AppContent() {
     );
   }
 
+
   return (
     <div className="min-h-screen bg-gray-50">
       {currentPage === 'home' && !user && (
@@ -45,9 +51,17 @@ function AppContent() {
       {currentPage === 'login' && !user && (
         <Login onBack={() => setCurrentPage('home')} />
       )}
-      {user && (
-        <Dashboard onLogout={handleLogout} />
+      {currentPage === 'dashboard' && user && (
+        <Dashboard
+          onLogout={handleLogout}
+          onNavigateToPremium={() => setCurrentPage('premium')}
+        />
       )}
+      {currentPage === 'premium' && user && (
+        <PremiumPage onBack={() => setCurrentPage('dashboard')} />
+      )}
+      <PWAInstallPrompt />
+      <ServerConfig />
       <Toaster />
     </div>
   );

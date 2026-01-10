@@ -1,0 +1,17 @@
+node_modules/
+vendor/
+dist/
+build/
+.env
+.DS_Store
+.vscode/
+.idea/
+*.log
+*.tmp
+*.apk
+storage/
+public/hot
+public/storage
+coverage/
+junit.xml
+test-results/

@@ -31,6 +31,8 @@ class DatabaseSeeder extends Seeder
             EpocaEquipaSeeder::class,
             EquipaSeeder::class,
             EscalaoSeeder::class,
+            AdminUserSeeder::class, // <- Adiciona esta linha
+
         ]);
     }
 }

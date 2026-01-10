@@ -35,9 +35,21 @@ return [
     |
     */
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guards
+    |--------------------------------------------------------------------------
+    */
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // Guard para API usando Sanctum
+        'api' => [
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
     ],

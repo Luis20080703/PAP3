@@ -14,7 +14,8 @@ class Atleta extends Model
         'equipa_id',
         'epoca_id',
         'posicao',
-        'numero'
+        'numero',
+        'escalao'
     ];
 
     protected $casts = [

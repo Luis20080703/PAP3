@@ -1,0 +1,14 @@
+{
+  "appId": "com.nexushand.app",
+  "appName": "NexusHand",
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

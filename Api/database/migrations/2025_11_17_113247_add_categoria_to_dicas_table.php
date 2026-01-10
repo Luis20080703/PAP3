@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('dicas', function (Blueprint $table) {
-            $table->enum('categoria', ['finta', 'drible', 'remate', 'defesa', 'táctica'])
-                ->default('táctica')
-                ->after('conteudo');
+            if (!Schema::hasColumn('dicas', 'categoria')) {
+                $table->enum('categoria', ['finta', 'drible', 'remate', 'defesa', 'táctica'])
+                    ->default('táctica')
+                    ->after('conteudo');
+            }
         });
     }
 

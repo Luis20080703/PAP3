@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Andebol Online — Apresentação</title>
+  <style>
+    :root{--bg:#07142f;--fg:#ffffff;--accent:#39a0ff}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    .stage{height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#021028 0%,#09223a 100%);color:var(--fg);}
+    .slide{width:1280px;height:720px;box-shadow:0 20px 60px rgba(0,0,0,.6);border-radius:10px;padding:48px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
+    h1{font-size:56px;margin:0 0 12px 0;letter-spacing:-1px}
+    h2{font-size:36px;margin:0 0 8px 0}
+    p{font-size:26px;margin:6px 0;color:rgba(255,255,255,.92)}
+    .muted{color:rgba(255,255,255,.65);font-size:20px}
+    .small{font-size:18px}
+    .accent{color:var(--accent)}
+    .foot{position:absolute;left:32px;bottom:26px;opacity:.8;font-size:14px}
+    .controls{position:absolute;right:32px;bottom:26px;display:flex;gap:8px}
+    button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--fg);padding:8px 12px;border-radius:6px}
+    /* responsive scaling for different screens */
+    .scale-wrap{display:flex;align-items:center;justify-content:center;height:100%}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="scale-wrap">
+      <div id="slide" class="slide" role="article" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="foot">Andebol Online — apresentação automática (silenciosa)</div>
+  <div class="controls">
+    <button id="prev">◀︎ Anterior</button>
+    <button id="pause">⏸ Pausa</button>
+    <button id="next">Próxima ▶︎</button>
+  </div>
+
+  <script>
+    // Slides content and durations (seconds)
+    const slides = [
+      // Durations adjusted to total 120 seconds
+      {title: 'Andebol Online', subtitle: 'Centralize vídeos, dicas e estatísticas', duration: 15},
+      {title: 'O Problema', subtitle: 'Treinadores gastam horas a compilar dados', bullet: ['Dados espalhados (Excel/WhatsApp)', 'Sem visão única de performance por época'], duration: 20},
+      {title: 'Funcionalidades', subtitle: 'Upload de jogadas e discussão tática', bullet: ['Comentários em cada jogada','Ranking de marcadores','Painel “Minhas Estatísticas”'], duration: 15},
+      {title: 'Registo de Estatísticas', subtitle: 'Golos, Jogos, Média — jogo a jogo', bullet: ['Registar golos rápidos','Média calculada automaticamente','Filtrar por época'], duration: 15},
+      {title: 'Validação de Treinadores', subtitle: 'Admin approve com 1 clique', bullet: ['Fluxo seguro','Treinadores só acedem quando aprovados'], duration: 15},
+      {title: 'Impacto', subtitle: 'Decisões de treino baseadas em dados', bullet: ['Menos trabalho administrativo','Maior envolvimento da equipa'], duration: 20},
+      {title: 'Call To Action', subtitle: 'Demo / Piloto de 2 semanas', bullet: ['Configuro um piloto com a tua equipa','Mostro resultados em treino'], duration: 20}
+    ];
+
+    const container = document.getElementById('slide');
+    let index = 0;
+    let timer = null;
+    let running = true;
+
+    function renderSlide(s){
+      const bullets = (s.bullet||[]).map(b=>`<li>${b}</li>`).join('');
+      container.innerHTML = `\
+        <div style="display:flex;flex-direction:column;gap:8px;height:100%;justify-content:center">\
+          <div>\
+            <h1>${s.title}</h1>\
+            <div class="muted">${s.subtitle}</div>\
+          </div>\
+          ${bullets?`<ul style="margin-top:18px;font-size:24px;color:rgba(255,255,255,.95)">${bullets}</ul>`:''}\
+        </div>`;
+    }
+
+    function show(i){
+      index = (i + slides.length) % slides.length;
+      renderSlide(slides[index]);
+      restartTimer();
+    }
+
+    function restartTimer(){
+      if(timer) clearTimeout(timer);
+      if(!running) return;
+      const d = (slides[index].duration || 8) * 1000;
+      timer = setTimeout(()=>{ show(index+1); }, d);
+    }
+
+    // controls
+    document.getElementById('next').addEventListener('click', ()=>{ running=true; show(index+1); });
+    document.getElementById('prev').addEventListener('click', ()=>{ running=true; show(index-1); });
+    const pauseBtn = document.getElementById('pause');
+    pauseBtn.addEventListener('click', ()=>{ running = !running; pauseBtn.textContent = running? '⏸ Pausa' : '▶️ Play'; if(running) restartTimer(); else if(timer) clearTimeout(timer); });
+
+    // keyboard: space pause/play, arrows next/prev
+    document.addEventListener('keydown', (e)=>{
+      if(e.code === 'Space'){ e.preventDefault(); pauseBtn.click(); }
+      if(e.code === 'ArrowRight'){ document.getElementById('next').click(); }
+      if(e.code === 'ArrowLeft'){ document.getElementById('prev').click(); }
+    });
+
+    // start
+    show(0);
+
+    // auto-scale to viewport while keeping 16:9
+    function scale(){
+      const wrap = document.querySelector('.scale-wrap');
+      const vw = window.innerWidth - 80; const vh = window.innerHeight - 80;
+      const scale = Math.min(vw/1280, vh/720);
+      wrap.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', scale); scale();
+  </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # Guia de Migração: React → Laravel 12 + Livewire 3.5
 
 ## 📋 Índice
+
 1. [Estrutura do Projeto](#estrutura-do-projeto)
 2. [Configuração Inicial](#configuração-inicial)
 3. [Base de Dados](#base-de-dados)
@@ -66,7 +67,7 @@ handball-platform/
 │       └── TipCategory.php
 ├── database/
 │   ├── migrations/
-│   │   ├── 2025_11_01_000001_create_users_table.php
+│   │   ├── 2025_11_01_000001_create_users_table.php++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------
 │   │   ├── 2025_11_01_000002_create_plays_table.php
 │   │   ├── 2025_11_01_000003_create_comments_table.php
 │   │   ├── 2025_11_01_000004_create_tips_table.php
@@ -131,6 +132,7 @@ npx tailwindcss init -p
 ```
 
 **tailwind.config.js:**
+
 ```javascript
 export default {
   content: [
@@ -142,10 +144,11 @@ export default {
     extend: {},
   },
   plugins: [],
-}
+};
 ```
 
 **resources/css/app.css:**
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -157,6 +160,7 @@ export default {
 ### 4. Configurar Base de Dados
 
 **.env:**
+
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -190,6 +194,7 @@ Ver ficheiro detalhado: **[DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)**
 Laravel vem com autenticação integrada, mas precisamos customizar para 2 tipos de utilizadores.
 
 **app/Models/User.php:**
+
 ```php
 <?php
 
@@ -248,6 +253,7 @@ class User extends Authenticatable
 ```
 
 **app/Enums/UserType.php:**
+
 ```php
 <?php
 
@@ -268,15 +274,15 @@ Ver ficheiro detalhado: **[LIVEWIRE_COMPONENTS.md](./LIVEWIRE_COMPONENTS.md)**
 
 ### Mapeamento React → Livewire
 
-| Componente React | Componente Livewire | Ficheiro |
-|-----------------|---------------------|----------|
-| Home.tsx | HomePage.php | app/Livewire/Home/HomePage.php |
-| Login.tsx | LoginForm.php | app/Livewire/Auth/LoginForm.php |
-| Dashboard.tsx | DashboardLayout.php | app/Livewire/Dashboard/DashboardLayout.php |
-| PlaysSection.tsx | PlaysList.php | app/Livewire/Plays/PlaysList.php |
-| TipsSection.tsx | TipsList.php | app/Livewire/Tips/TipsList.php |
-| TeamStatsSection.tsx | TeamStats.php | app/Livewire/Stats/TeamStats.php |
-| AthleteStatsSection.tsx | AthleteStats.php | app/Livewire/Stats/AthleteStats.php |
+| Componente React        | Componente Livewire | Ficheiro                                   |
+| ----------------------- | ------------------- | ------------------------------------------ |
+| Home.tsx                | HomePage.php        | app/Livewire/Home/HomePage.php             |
+| Login.tsx               | LoginForm.php       | app/Livewire/Auth/LoginForm.php            |
+| Dashboard.tsx           | DashboardLayout.php | app/Livewire/Dashboard/DashboardLayout.php |
+| PlaysSection.tsx        | PlaysList.php       | app/Livewire/Plays/PlaysList.php           |
+| TipsSection.tsx         | TipsList.php        | app/Livewire/Tips/TipsList.php             |
+| TeamStatsSection.tsx    | TeamStats.php       | app/Livewire/Stats/TeamStats.php           |
+| AthleteStatsSection.tsx | AthleteStats.php    | app/Livewire/Stats/AthleteStats.php        |
 
 ---
 
@@ -380,11 +386,20 @@ Ver ficheiro detalhado: **[LIVEWIRE_COMPONENTS.md](./LIVEWIRE_COMPONENTS.md)**
 # Criar migration
 php artisan make:migration create_plays_table
 
-# Criar model com migration
-php artisan make:model Play -m
+# Criar model com migration e factory
+php artisan make:model Play -mf
 
 # Criar componente Livewire
 php artisan make:livewire Plays/PlaysList
+
+# Criar controller
+php artisan make:controller PlayController
+
+# Criar middleware
+php artisan make:middleware CheckUserType
+
+# Criar enum
+php artisan make:enum UserType
 
 # Executar migrations
 php artisan migrate
@@ -398,7 +413,116 @@ php artisan config:clear
 php artisan view:clear
 
 # Servidor de desenvolvimento
+php artisan serve --host=0.0.0.0 --port=8000
+
+# Compilar assets
+npm run dev
+npm run build
+```
+
+---
+
+## 🎯 Vantagens da Migração Laravel + Livewire
+
+### ✅ Benefícios
+
+1. **Performance**: Menos JavaScript, mais server-side rendering
+2. **SEO**: Melhor indexação pelos motores de busca
+3. **Manutenção**: Código mais simples e unificado
+4. **Segurança**: Validações server-side nativas
+5. **Escalabilidade**: Laravel é robusto para aplicações grandes
+6. **Ecosystem**: Packages Laravel (Sanctum, Horizon, etc.)
+
+### ⚠️ Considerações
+
+1. **Interatividade**: Menos fluida que SPA React
+2. **Offline**: Sem capacidades PWA nativas
+3. **Mobile**: Precisará de API para app móvel
+4. **Real-time**: Requer WebSockets (Laravel Echo)
+
+---
+
+## 📱 Estratégia Híbrida Recomendada
+
+### Opção 1: Laravel + Livewire (Web) + API (Mobile)
+
+```
+Laravel Backend
+├── Web: Livewire Components
+├── API: JSON endpoints
+└── Mobile: React Native / Flutter
+```
+
+### Opção 2: Manter React + Melhorar API Laravel
+
+```
+Laravel API Backend
+├── Web: React SPA (atual)
+├── Mobile: React Native
+└── PWA: Capacitor (atual)
+```
+
+---
+
+## 🔄 Cronograma de Migração (14 dias)
+
+| Dia   | Tarefa                        | Status      |
+| ----- | ----------------------------- | ----------- |
+| 1-2   | Setup + Models + Migrations   | 🟡 Planeado |
+| 3-4   | Autenticação + Página Inicial | 🟡 Planeado |
+| 5-6   | Dashboard + Navegação         | 🟡 Planeado |
+| 7-8   | Sistema de Jogadas            | 🟡 Planeado |
+| 9-10  | Dicas Técnicas                | 🟡 Planeado |
+| 11-12 | Estatísticas + Gráficos       | 🟡 Planeado |
+| 13-14 | Testes + Refinamento          | 🟡 Planeado |
+
+---
+
+## 💡 Recomendação Final
+
+**Considerando que o projeto atual está 100% funcional como PWA e APK**, sugiro:
+
+1. **Manter a versão React atual** para produção
+2. **Criar versão Laravel em paralelo** como prova de conceito
+3. **Comparar performance e UX** entre as duas versões
+4. **Decidir migração** baseada em resultados concretos
+
+O projeto atual já atende todos os requisitos e funciona perfeitamente em mobile. A migração deve ser justificada por benefícios claros e mensuráveis.
+
+---
+
+## 📞 Próximos Passos
+
+1. **Avaliar necessidade real** da migração
+2. **Se decidir migrar**: Seguir este guia passo-a-passo
+3. **Se manter React**: Focar em melhorias e novas funcionalidades
+4. **Considerar API Laravel** para futuras integrações
+
+**Status atual**: Projeto React funcional ✅ | Guia Laravel pronto ✅el com migration
+php artisan make:model Play -m
+
+# Criar componente Livewire
+
+php artisan make:livewire Plays/PlaysList
+
+# Executar migrations
+
+php artisan migrate
+
+# Executar seeders
+
+php artisan db:seed
+
+# Limpar cache
+
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+
+# Servidor de desenvolvimento
+
 php artisan serve
+
 ```
 
 ---
@@ -451,3 +575,4 @@ Para dúvidas sobre:
 - **Tailwind**: https://tailwindcss.com/docs
 
 Boa sorte com o teu projeto PAP! 🎉
+```
