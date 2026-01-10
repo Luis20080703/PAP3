@@ -18,7 +18,7 @@ A solução utiliza uma arquitetura moderna separando Frontend e Backend:
 - **Funcionalidades:** SPA (Single Page Application), Gestão de Estado Global, PWA ready.
 
 ### **Backend (`Api/`)**
-- **Core:** Laravel 10 (PHP 8.2+)
+- **Core:** Laravel 12 (PHP 8.2+)
 - **Base de Dados:** SQLite
 - **API:** RESTful, Autenticação Sanctum
 - **Segurança:** Validação de dados.
