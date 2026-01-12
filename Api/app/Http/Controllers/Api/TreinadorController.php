@@ -129,24 +129,24 @@ class TreinadorController extends Controller
             // ✅ Fallback: Se o perfil de treinador não existe, tentamos encontrar a equipa pelo nome no user
             Log::info('Perfil de treinador em falta, a tentar recuperar via equipa-string', ['user_id' => $user->id, 'equipa' => $user->equipa]);
             
-            if (!empty($user->equipa)) {
-                $equipa = \App\Models\Equipa::where('nome', $user->equipa)->first();
-                if ($equipa) {
-                    $equipaId = $equipa->id;
-                    
-                    // ✅ Auto-reparação: Criar o perfil de treinador em falta
-                    $epoca = \App\Models\Epoca::first();
-                    if ($epoca) {
-                        \App\Models\Treinador::create([
-                            'user_id' => $user->id,
-                            'equipa_id' => $equipaId,
-                            'epoca_id' => $epoca->id,
-                            'validado' => $user->validado
-                        ]);
+                if (!empty($user->equipa)) {
+                    $equipa = \App\Models\Equipa::where('nome', $user->equipa)->first();
+                    if ($equipa) {
+                        $equipaId = $equipa->id;
+                        
+                        // ✅ Auto-reparação: Criar o perfil de treinador em falta
+                        $epoca = \App\Models\Epoca::first();
+                        if ($epoca) {
+                            \App\Models\Treinador::create([
+                                'user_id' => $user->id,
+                                'equipa_id' => $equipaId,
+                                'epoca_id' => $epoca->id,
+                                'validado' => $user->validado
+                            ]);
+                        }
                     }
                 }
             }
-        }
 
         if (!$equipaId) {
              return response()->json(['success' => false, 'message' => 'Não foi possível determinar a sua equipa. Contacte o administrador.'], 404);
