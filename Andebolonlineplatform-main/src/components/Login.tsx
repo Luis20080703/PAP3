@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -46,6 +44,7 @@ export function Login({ onBack }: LoginProps) {
   const [numero, setNumero] = useState('');
   const [escalao, setEscalao] = useState('');
   const [escaloes, setEscaloes] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('login');
 
   // Carregar equipas ao montar o componente
   useEffect(() => {
@@ -64,28 +63,7 @@ export function Login({ onBack }: LoginProps) {
     fetchEquipasAndEscaloes();
   }, []);
 
-  const [loginBtnPos, setLoginBtnPos] = useState({ x: 0, y: 0 });
-  const [registerBtnPos, setRegisterBtnPos] = useState({ x: 0, y: 0 });
 
-  // Fun helper to move button randomly
-  const moveButton = (type: 'login' | 'register') => {
-    // Mantemos o movimento lateral (X) igual
-    const xMin = -150;
-    const xMax = 150;
-    const x = Math.random() * (xMax - xMin) + xMin;
-
-    // Restringimos o movimento vertical (Y) para que o botão não fuja para cima do formulário.
-    // Usamos valores positivos para que ele se desloque essencialmente para baixo.
-    const yMin = 0;
-    const yMax = 150;
-    const y = Math.random() * (yMax - yMin) + yMin;
-
-    if (type === 'login') {
-      setLoginBtnPos({ x, y });
-    } else {
-      setRegisterBtnPos({ x, y });
-    }
-  };
 
   // --- HANDLE LOGIN ---
   const handleLogin = async (e: React.FormEvent) => {
@@ -196,271 +174,209 @@ export function Login({ onBack }: LoginProps) {
     }
   };
 
-  const isLoginValid = loginEmail && loginPassword;
-  const isRegisterValid = () => {
-    const baseValid = registerNome && registerEmail && registerPassword && equipa;
-    if (!baseValid) return false;
-    if (userType === 'atleta') return !!posicao && !!numero && !!escalao;
-    if (userType === 'treinador') return !!escalao;
-    return true;
-  };
+
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 md:py-12 px-4">
-      <div className="max-w-md mx-auto">
-        <Button variant="ghost" onClick={onBack} className="mb-4 w-full sm:w-auto">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-8 px-4">
+      <div className="w-full max-w-[500px]">
+        <Button variant="ghost" onClick={onBack} className="mb-4 text-gray-600 hover:text-gray-900">
           <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
         </Button>
 
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="login" className="text-sm">Entrar</TabsTrigger>
-            <TabsTrigger value="register" className="text-sm">Registar</TabsTrigger>
-          </TabsList>
+        <div className="custom-login-container bg-white">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="login-toggle-container">
+              <div className="login-toggle-heading">NexusHand</div>
+              <div className="login-toggle-wrapper">
+                <input
+                  type="radio"
+                  name="auth_type"
+                  value="login"
+                  id="toggle-login"
+                  className="toggle-input"
+                  checked={activeTab === 'login'}
+                  onChange={() => setActiveTab('login')}
+                  readOnly
+                />
+                <label htmlFor="toggle-login" className="login-toggle-tab" onClick={() => setActiveTab('login')}> Entrar no jogo </label>
 
-          <TabsContent value="login">
-            <Card>
-              <CardHeader>
-                <CardTitle>Entrar no NexusHand</CardTitle>
-                <CardDescription>
-                  Aceda à sua conta para utilizar todas as funcionalidades
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="seu.email@exemplo.com"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                    />
-                  </div>
-                  <div
-                    onMouseEnter={() => {
-                      if (!isLoginValid) moveButton('login');
-                      else setLoginBtnPos({ x: 0, y: 0 }); // Reset if valid
+                <input
+                  type="radio"
+                  name="auth_type"
+                  value="register"
+                  id="toggle-register"
+                  className="toggle-input"
+                  checked={activeTab === 'register'}
+                  onChange={() => setActiveTab('register')}
+                  readOnly
+                />
+                <label htmlFor="toggle-register" className="login-toggle-tab" onClick={() => setActiveTab('register')}> Criar conta </label>
+              </div>
+            </div>
+
+            <TabsContent value="login">
+              <div className="login-heading">Entrar no jogo</div>
+              <form onSubmit={handleLogin} className="login-form">
+                <input
+                  required
+                  className="login-input"
+                  type="email"
+                  name="email"
+                  id="login-email"
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                />
+                <input
+                  required
+                  className="login-input"
+                  type="password"
+                  name="password"
+                  id="login-password"
+                  placeholder="Password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                />
+
+
+                <button
+                  className="login-submit-button"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" /> A entrar no jogo
+                    </span>
+                  ) : 'Entrar no jogo'}
+                </button>
+              </form>
+
+
+
+            </TabsContent>
+
+            <TabsContent value="register">
+              <div className="login-heading">Criar conta</div>
+              <form onSubmit={handleRegister} className="login-form">
+                <input
+                  required
+                  className="login-input"
+                  type="text"
+                  placeholder="Nome Completo"
+                  value={registerNome}
+                  onChange={(e) => setRegisterNome(e.target.value)}
+                />
+                <input
+                  required
+                  className="login-input"
+                  type="email"
+                  placeholder="Email"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
+                />
+                <input
+                  required
+                  className="login-input"
+                  type="password"
+                  placeholder="Password"
+                  value={registerPassword}
+                  onChange={(e) => setRegisterPassword(e.target.value)}
+                />
+
+                <select
+                  value={equipa}
+                  onChange={(e) => setEquipa(e.target.value)}
+                  className="login-input"
+                  required
+                >
+                  <option value="">Selecionar equipa</option>
+                  {equipas.map((team: any) => (
+                    <option key={team.id} value={team.nome}>
+                      {team.nome}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={escalao}
+                  onChange={(e) => setEscalao(e.target.value)}
+                  className="login-input"
+                  required
+                >
+                  <option value="">Selecionar escalão</option>
+                  {escaloes.map((level: any) => (
+                    <option key={level.id} value={level.nome}>
+                      {level.nome}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="mt-4 px-2">
+                  <Label className="mb-2 block text-gray-500 text-sm">Tipo de Utilizador</Label>
+                  <RadioGroup
+                    value={userType}
+                    onValueChange={(value: string) => {
+                      setUserType(value as UserType);
+                      if (value === 'treinador') {
+                        setPosicao('');
+                        setNumero('');
+                      }
                     }}
-                    style={{
-                      transform: `translate(${loginBtnPos.x}px, ${loginBtnPos.y}px)`,
-                      transition: 'transform 0.2s ease-out'
-                    }}
+                    className="flex gap-4"
                   >
-                    <button type="submit" className="fancy-btn" disabled={isLoading}>
-                      <span>
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            A entrar...
-                          </>
-                        ) : (
-                          'Entrar'
-                        )}
-                      </span>
-                    </button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="register">
-            <Card>
-              <CardHeader>
-                <CardTitle>Criar Conta</CardTitle>
-                <CardDescription>Registe-se como atleta ou treinador</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="register-nome">Nome Completo</Label>
-                    <Input
-                      id="register-nome"
-                      type="text"
-                      placeholder="João Silva"
-                      value={registerNome}
-                      onChange={(e) => setRegisterNome(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
-                    <Input
-                      id="register-email"
-                      type="email"
-                      placeholder="seu.email@exemplo.com"
-                      value={registerEmail}
-                      onChange={(e) => setRegisterEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-password">Password</Label>
-                    <Input
-                      id="register-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={registerPassword}
-                      onChange={(e) => setRegisterPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="equipa">Equipa</Label>
-                    <select
-                      id="equipa"
-                      value={equipa}
-                      onChange={(e) => setEquipa(e.target.value)}
-                      className="w-full p-2 border rounded-md bg-white text-sm"
-                      required
-                    >
-                      <option value="">Selecionar equipa</option>
-                      {equipas.map((team: any) => (
-                        <option key={team.id} value={team.nome}>
-                          {team.nome}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="escalao">Escalão *</Label>
-                    <select
-                      id="escalao"
-                      value={escalao}
-                      onChange={(e) => setEscalao(e.target.value)}
-                      className="w-full p-2 border rounded-md bg-white text-sm"
-                      required
-                    >
-                      <option value="">Selecionar escalão</option>
-                      {escaloes.map((level: any) => (
-                        <option key={level.id} value={level.nome}>
-                          {level.nome}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Tipo de Utilizador</Label>
-                    <RadioGroup
-                      value={userType}
-                      onValueChange={(value: string) => {
-                        setUserType(value as UserType);
-                        if (value === 'treinador') {
-                          setPosicao('');
-                          setNumero('');
-                        }
-                      }}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="atleta" id="atleta" />
-                        <Label htmlFor="atleta" className="cursor-pointer">
-                          Atleta
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="treinador" id="treinador" />
-                        <Label htmlFor="treinador" className="cursor-pointer">
-                          Treinador
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  {userType === 'treinador' && (
-                    <div className="space-y-2 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <Label className="text-blue-700 font-semibold">👨‍🏫 Registo como Treinador</Label>
-                      <p className="text-sm text-blue-600 mb-2">
-                        Será criado automaticamente um registo na tabela de treinadores.
-                      </p>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="atleta" id="atleta" />
+                      <Label htmlFor="atleta" className="cursor-pointer text-sm text-gray-600">Atleta</Label>
                     </div>
-                  )}
-
-                  {userType === 'atleta' && (
-                    <div className="space-y-2 p-4 bg-green-50 rounded-lg border border-green-200">
-                      <Label className="text-green-700 font-semibold">⚽ Informações do Atleta</Label>
-                      <p className="text-xs text-green-600 mb-2">
-                        Após o registo, terá de aguardar aprovação do treinador.
-                      </p>
-                      <div className="space-y-2">
-                        <Label htmlFor="posicao">Posição *</Label>
-                        <select
-                          id="posicao"
-                          value={posicao}
-                          onChange={(e) => setPosicao(e.target.value)}
-                          className="w-full p-2 border rounded-md bg-white"
-                          required
-                        >
-                          <option value="">Selecionar posição</option>
-                          <option value="Pivô">Pivô</option>
-                          <option value="Ponta">Ponta</option>
-                          <option value="Lateral Direito">Lateral Direito</option>
-                          <option value="Lateral Esquerdo">Lateral Esquerdo</option>
-                          <option value="Guarda-Redes">Guarda-Redes</option>
-                          <option value="Central">Central</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="numero">Número da Camisola *</Label>
-                        <Input
-                          id="numero"
-                          type="number"
-                          placeholder="Ex: 7"
-                          value={numero}
-                          onChange={(e) => setNumero(e.target.value)}
-                          min="1"
-                          max="99"
-                          required
-                        />
-                      </div>
-
-                      <p className="text-xs text-green-600 mt-2">* Campos obrigatórios para atletas</p>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="treinador" id="treinador" />
+                      <Label htmlFor="treinador" className="cursor-pointer text-sm text-gray-600">Treinador</Label>
                     </div>
-                  )}
+                  </RadioGroup>
+                </div>
 
-                  <div
-                    onMouseEnter={() => {
-                      if (!isRegisterValid()) moveButton('register');
-                      else setRegisterBtnPos({ x: 0, y: 0 }); // Reset if valid
-                    }}
-                    style={{
-                      transform: `translate(${registerBtnPos.x}px, ${registerBtnPos.y}px)`,
-                      transition: 'transform 0.2s ease-out'
-                    }}
-                  >
-                    <button type="submit" className="fancy-btn" disabled={isLoading}>
-                      <span>
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            A criar conta...
-                          </>
-                        ) : (
-                          'Criar Conta'
-                        )}
-                      </span>
-                    </button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div >
-    </div >
+                {userType === 'atleta' && (
+                  <>
+                    <select
+                      value={posicao}
+                      onChange={(e) => setPosicao(e.target.value)}
+                      className="login-input"
+                      required
+                    >
+                      <option value="">Selecionar posição</option>
+                      <option value="Pivô">Pivô</option>
+                      <option value="Ponta">Ponta</option>
+                      <option value="Lateral Direito">Lateral Direito</option>
+                      <option value="Lateral Esquerdo">Lateral Esquerdo</option>
+                      <option value="Guarda-Redes">Guarda-Redes</option>
+                      <option value="Central">Central</option>
+                    </select>
+                    <input
+                      type="number"
+                      placeholder="Número da Camisola"
+                      value={numero}
+                      onChange={(e) => setNumero(e.target.value)}
+                      className="login-input"
+                      min="1"
+                      max="99"
+                      required
+                    />
+                  </>
+                )}
+
+                <button
+                  className="login-submit-button"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'A criar conta...' : 'Criar'}
+                </button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
   );
 }

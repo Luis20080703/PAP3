@@ -124,14 +124,14 @@ export function PendingAthletesView() {
                                 </div>
 
                                 <div className="flex gap-2 pt-2">
-                                    <Button
-                                        variant="default"
-                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                                        onClick={() => handleApprove(athlete.id)}
-                                    >
-                                        <Check className="w-4 h-4 mr-2" />
-                                        Aprovar
-                                    </Button>
+                                    <button className="aprovar-button flex-1" onClick={() => handleApprove(athlete.id)}>
+                                        <span className="aprovar-button-shadow"></span>
+                                        <span className="aprovar-button-edge"></span>
+                                        <span className="aprovar-button-front text-white flex items-center justify-center gap-2">
+                                            <Check className="w-4 h-4" />
+                                            Aprovar
+                                        </span>
+                                    </button>
                                     <Button
                                         variant="destructive"
                                         size="icon"
