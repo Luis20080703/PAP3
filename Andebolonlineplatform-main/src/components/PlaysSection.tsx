@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -30,7 +29,6 @@ export function PlaysSection() {
   const [newPlayVideoUrl, setNewPlayVideoUrl] = useState('');
   const [videoOption, setVideoOption] = useState<'url' | 'upload'>('url');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [filePreviewUrl, setFilePreviewUrl] = useState<string>('');
 
   const convertUserType = (tipo: string): 'atleta' | 'treinador' => {
     return tipo === 'treinador' ? 'treinador' : 'atleta';
@@ -86,7 +84,6 @@ export function PlaysSection() {
       setNewPlayCategory('');
       setNewPlayVideoUrl('');
       setSelectedFile(null);
-      setFilePreviewUrl('');
       setVideoOption('url');
       toast.success('Jogada criada com sucesso!');
     } catch (error) {
@@ -168,139 +165,157 @@ export function PlaysSection() {
             Partilhe e comente jogadas com a comunidade
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Jogada
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Criar Nova Jogada</DialogTitle>
-              <DialogDescription>
-                Partilhe uma jogada com a comunidade
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="play-title">Título *</Label>
-                <Input
-                  id="play-title"
-                  placeholder="Ex: Contra-ataque rápido..."
-                  value={newPlayTitle}
-                  onChange={(e) => setNewPlayTitle(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="play-description">Descrição *</Label>
-                <Textarea
-                  id="play-description"
-                  placeholder="Descreva a jogada..."
-                  value={newPlayDescription}
-                  onChange={(e) => setNewPlayDescription(e.target.value)}
-                  rows={4}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="play-category">Categoria *</Label>
-                <Select value={newPlayCategory} onValueChange={setNewPlayCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Contra-ataque">Contra-ataque</SelectItem>
-                    <SelectItem value="Ataque posicional">Ataque posicional</SelectItem>
-                    <SelectItem value="Técnica individual">Técnica individual</SelectItem>
-                    <SelectItem value="Defesa">Defesa</SelectItem>
-                    <SelectItem value="Transição">Transição</SelectItem>
-                    <SelectItem value="Bola parada">Bola parada</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Vídeo (opcional)</Label>
-                <div className="flex gap-2 mb-3">
-                  <Button
-                    type="button"
-                    variant={videoOption === 'url' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setVideoOption('url')}
-                  >
-                    URL
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={videoOption === 'upload' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setVideoOption('upload')}
-                  >
-                    Upload
-                  </Button>
-                </div>
-                {videoOption === 'url' ? (
+        {user.tipo !== 'admin' && user.tipo !== 'root' && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="btn-create-play w-full sm:w-auto h-auto">
+                <Plus className="w-5 h-5 mr-3" />
+                Nova Jogada
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="jogada-btn">
+              <DialogHeader>
+                <DialogTitle>Criar Nova Jogada</DialogTitle>
+                <DialogDescription>
+                  Partilhe uma jogada com a comunidade
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="play-title">Título *</Label>
                   <Input
-                    id="play-video"
-                    type="url"
-                    placeholder="https://..."
-                    value={newPlayVideoUrl}
-                    onChange={(e) => setNewPlayVideoUrl(e.target.value)}
+                    id="play-title"
+                    placeholder="Ex: Contra-ataque rápido..."
+                    value={newPlayTitle}
+                    onChange={(e) => setNewPlayTitle(e.target.value)}
                   />
-                ) : (
-                  <div className="space-y-2">
-                    <Input
-                      id="play-file"
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        setSelectedFile(file);
-                        if (file) {
-                          setFilePreviewUrl(URL.createObjectURL(file));
-                        } else {
-                          setFilePreviewUrl('');
-                        }
-                      }}
-                    />
-                    {selectedFile && (
-                      <p className="text-sm text-gray-600">
-                        Ficheiro selecionado: {selectedFile.name}
-                      </p>
-                    )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="play-description">Descrição *</Label>
+                  <Textarea
+                    id="play-description"
+                    placeholder="Descreva a jogada..."
+                    value={newPlayDescription}
+                    onChange={(e) => setNewPlayDescription(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="play-category">Categoria *</Label>
+                  <Select value={newPlayCategory} onValueChange={setNewPlayCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Contra-ataque">Contra-ataque</SelectItem>
+                      <SelectItem value="Ataque posicional">Ataque posicional</SelectItem>
+                      <SelectItem value="Técnica individual">Técnica individual</SelectItem>
+                      <SelectItem value="Defesa">Defesa</SelectItem>
+                      <SelectItem value="Transição">Transição</SelectItem>
+                      <SelectItem value="Bola parada">Bola parada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Vídeo (opcional)</Label>
+                  <div className="flex gap-2 mb-3">
+                    <Button
+                      type="button"
+                      variant={videoOption === 'url' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVideoOption('url')}
+                    >
+                      URL
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={videoOption === 'upload' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVideoOption('upload')}
+                    >
+                      Upload
+                    </Button>
                   </div>
-                )}
+                  {videoOption === 'url' ? (
+                    <Input
+                      id="play-video"
+                      type="url"
+                      placeholder="https://..."
+                      value={newPlayVideoUrl}
+                      onChange={(e) => setNewPlayVideoUrl(e.target.value)}
+                    />
+                  ) : (
+                    <div className="space-y-2">
+                      <Input
+                        id="play-file"
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setSelectedFile(file);
+                        }}
+                      />
+                      {selectedFile && (
+                        <p className="text-sm text-gray-600">
+                          Ficheiro selecionado: {selectedFile.name}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isSubmitting}>
-                Cancelar
-              </Button>
-              <Button onClick={handleCreatePlay} disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    A criar...
-                  </>
-                ) : (
-                  'Criar Jogada'
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isSubmitting}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleCreatePlay} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      A criar...
+                    </>
+                  ) : (
+                    'Criar Jogada'
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <Input
-          type="text"
-          placeholder="Pesquisar jogadas..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 h-9"
-        />
-      </div>
+      {/* Search Bar - Custom Twitter Style */}
+      <form className="twitter-search-form" onSubmit={(e) => e.preventDefault()}>
+        <label className="twitter-search-label" htmlFor="search">
+          <input
+            className="twitter-search-input"
+            type="text"
+            required
+            placeholder="Pesquisar jogadas..."
+            id="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="twitter-search-fancy-bg"></div>
+          <div className="twitter-search-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <g>
+                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-3.365-7.5-7.5z"></path>
+              </g>
+            </svg>
+          </div>
+          <button
+            className="twitter-search-close-btn"
+            type="button"
+            onClick={() => setSearchQuery('')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+            </svg>
+          </button>
+        </label>
+      </form>
 
       {jogadasCarregando ? (
         <div className="flex justify-center items-center py-12">
@@ -309,53 +324,47 @@ export function PlaysSection() {
       ) : (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
           {filteredPlays.map((play: PlayDisplay) => {
-
-
-
             return (
-              <Card key={play.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+              <div key={play.id} className="play-tip-card">
+                <div className="play-tip-content">
+                  <div className="flex justify-between items-start w-full">
                     <div className="flex-1">
-                      <CardTitle className="line-clamp-2">{play.titulo}</CardTitle>
-                      <CardDescription className="mt-2">
+                      <h3 className="text-xl font-bold leading-tight line-clamp-2">{play.titulo}</h3>
+                      <p className="text-sm text-blue-100 mt-1">
                         por {play.autorNome} • {play.equipa}
-                      </CardDescription>
+                      </p>
                     </div>
-                    {/* ✅ BOTÃO CORRIGIDO - COM ACL */}
                     {canModifyPlay(play) && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeletePlay(play.id)}
                         disabled={isSubmitting}
-                        title={
-                          user.tipo === 'admin' ? 'Admin pode apagar qualquer jogada' :
-                            user.tipo === 'treinador' ? 'Treinador pode apagar jogadas da sua equipa' :
-                              'Apagar minha jogada'
-                        }
+                        className="text-white hover:bg-white/20 h-8 w-8 p-0"
                       >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     )}
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant="secondary">{play.categoria}</Badge>
-                    <Badge variant="outline">
+
+                  <div className="flex gap-2">
+                    <Badge className="bg-white/20 text-white hover:bg-white/30 border-none">{play.categoria}</Badge>
+                    <Badge variant="outline" className="text-white border-white/40">
                       {play.autorTipo === 'atleta' ? 'Atleta' : 'Treinador'}
                     </Badge>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <VideoPreview url={play.urlVideo} />
-                  <p className="text-gray-600 line-clamp-3">{play.descricao}</p>
-                </CardContent>
-                <CardFooter>
+
+                  <div className="w-full mt-2">
+                    <VideoPreview url={play.urlVideo} />
+                  </div>
+
+                  <p className="play-tip-para line-clamp-3 flex-1">{play.descricao}</p>
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
-                        className="w-full"
+                        className="w-full bg-transparent border-white/40 text-white hover:bg-white/20 mt-2"
                         onClick={() => setSelectedPlay(play.id)}
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
@@ -435,8 +444,8 @@ export function PlaysSection() {
                       )}
                     </DialogContent>
                   </Dialog>
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -449,10 +458,12 @@ export function PlaysSection() {
           <p className="text-gray-400 mb-4">
             Seja o primeiro a partilhar uma jogada!
           </p>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Criar Primeira Jogada
-          </Button>
+          {user.tipo !== 'admin' && user.tipo !== 'root' && (
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Primeira Jogada
+            </Button>
+          )}
         </div>
       )}
 

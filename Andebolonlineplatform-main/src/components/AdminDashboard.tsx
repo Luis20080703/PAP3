@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';

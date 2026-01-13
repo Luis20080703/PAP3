@@ -4251,3 +4251,286 @@ html {
 .aprovar-button:focus:not(:focus-visible) {
   outline: none;
 }
+
+/* Voltar Button Styles */
+.voltar-button {
+  position: relative;
+  padding: 10px 20px;
+  border-radius: 7px;
+  border: 1px solid rgb(61, 106, 255);
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 2px;
+  background: transparent;
+  color: #000000;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+  cursor: pointer;
+}
+
+.voltar-button:hover {
+  background: rgb(61, 106, 255);
+  box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815);
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+.voltar-button:hover::before {
+  -webkit-animation: sh02 0.5s 0s linear;
+  -moz-animation: sh02 0.5s 0s linear;
+  animation: sh02 0.5s 0s linear;
+}
+
+.voltar-button::before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: #fff;
+  box-shadow: 0 0 50px 30px #fff;
+  -webkit-transform: skewX(-20deg);
+  -moz-transform: skewX(-20deg);
+  -ms-transform: skewX(-20deg);
+  -o-transform: skewX(-20deg);
+  transform: skewX(-20deg);
+}
+
+@keyframes sh02 {
+  from {
+    opacity: 0;
+    left: 0%;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    left: 100%;
+  }
+}
+
+.voltar-button:active {
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.2s ease-in;
+  -moz-transition: box-shadow 0.2s ease-in;
+  transition: box-shadow 0.2s ease-in;
+}
+
+/* Custom Blue Cards for Plays and Tips */
+.play-tip-card {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  margin: 40px auto 10px;
+  z-index: 10;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  display: flex;
+  align-self: start;
+  /* Impede que o card estique verticalmente na grid */
+}
+
+.play-tip-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 22px;
+  color: #ffffff;
+  background: #0a3cff;
+  width: 100%;
+  z-index: 5;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  /* Garante que o conteúdo não saia do card */
+}
+
+.play-tip-card::before,
+.play-tip-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  pointer-events: none;
+}
+
+.play-tip-card::before {
+  background: #ced8ff;
+  z-index: 4;
+  transform: translateY(-12px) scale(0.92);
+  opacity: 0.8;
+}
+
+.play-tip-card::after {
+  background: #e7ecff;
+  z-index: 3;
+  transform: translateY(-22px) scale(0.85);
+  opacity: 0.6;
+}
+
+.play-tip-card:hover {
+  transform: translateY(-12px);
+}
+
+.play-tip-card:hover::before {
+  transform: rotate(-10deg) scale(1.05);
+  opacity: 1;
+}
+
+.play-tip-card:hover::after {
+  transform: rotate(10deg) scale(1.05);
+  opacity: 1;
+}
+
+.play-tip-para {
+  font-size: 14px;
+  color: #ffffff;
+  z-index: 6;
+  line-height: 1.5;
+}
+
+.btn-create-play {
+  font-size: 0.9rem;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  outline: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  background-color: rgb(14, 14, 26);
+  color: rgb(234, 234, 234);
+  font-weight: 700;
+  transition: 0.6s;
+  box-shadow: 0px 0px 30px #1f4c65;
+  -webkit-box-reflect: below 10px linear-gradient(to bottom, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.4));
+}
+
+.btn-create-play:active {
+  scale: 0.92;
+}
+
+.btn-create-play:hover {
+  background: rgb(2, 29, 78);
+  background: linear-gradient(270deg, rgba(2, 29, 78, 0.681) 0%, rgba(31, 215, 232, 0.873) 60%);
+  color: rgb(4, 4, 38);
+}
+
+/* Twitter Search Bar Style */
+.twitter-search-form {
+  --input-text-color: #333333;
+  --input-bg-color: #ffffff;
+  --focus-input-bg-color: #ffffff;
+  --text-color: #949faa;
+  --active-color: #1b9bee;
+  --width-of-input: 200px;
+  --inline-padding-of-input: 1.2em;
+  --gap: 0.9rem;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: var(--width-of-input);
+  position: relative;
+  isolation: isolate;
+}
+
+.twitter-search-fancy-bg {
+  position: absolute;
+  width: 100%;
+  inset: 0;
+  background: var(--input-bg-color);
+  border-radius: 30px;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.twitter-search-label {
+  width: 100%;
+  padding: 0.8em;
+  height: 40px;
+  padding-inline: var(--inline-padding-of-input);
+  display: flex;
+  align-items: center;
+}
+
+.twitter-search-icon,
+.twitter-search-close-btn {
+  position: absolute;
+}
+
+.twitter-search-icon {
+  fill: var(--text-color);
+  left: var(--inline-padding-of-input);
+}
+
+.twitter-search-icon svg {
+  width: 17px;
+  display: block;
+}
+
+.twitter-search-close-btn {
+  border: none;
+  right: var(--inline-padding-of-input);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  padding: 0.1em;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--active-color);
+  opacity: 0;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.twitter-search-input {
+  color: var(--input-text-color);
+  width: 100%;
+  margin-inline: min(2em, calc(var(--inline-padding-of-input) + var(--gap)));
+  background: none;
+  border: none;
+}
+
+.twitter-search-input:focus {
+  outline: none;
+}
+
+.twitter-search-input::placeholder {
+  color: var(--text-color)
+}
+
+.twitter-search-input:focus~.twitter-search-fancy-bg {
+  border: 1px solid var(--active-color);
+  background: var(--focus-input-bg-color);
+}
+
+.twitter-search-input:focus~.twitter-search-icon {
+  fill: var(--active-color);
+}
+
+.twitter-search-input:valid~.twitter-search-close-btn {
+  opacity: 1;
+  visibility: visible;
+}

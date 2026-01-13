@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { Card, CardContent, CardHeader } from './ui/card';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { Check, X, Clock, RefreshCw } from 'lucide-react';
 import { trainersAPI } from '../services/api';
 import { toast } from "sonner";
@@ -95,54 +94,56 @@ export function PendingAthletesView() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {athletes.map((athlete) => (
-                        <Card key={athlete.id} className="overflow-hidden border-orange-100 dark:border-orange-900 shadow-sm hover:shadow-md transition-shadow">
-                            <CardHeader className="bg-orange-50/50 dark:bg-orange-950/20 pb-3">
-                                <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <CardTitle className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                                            {athlete.user?.nome}
-                                        </CardTitle>
-                                        <CardDescription>{athlete.user?.email}</CardDescription>
+                        <div key={athlete.id} className="play-tip-card">
+                            <div className="play-tip-content">
+                                <div className="flex flex-col w-full gap-4">
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1">
+                                            <h3 className="text-xl font-bold text-white">
+                                                {athlete.user?.nome}
+                                            </h3>
+                                            <p className="text-blue-100/70 text-sm font-medium">{athlete.user?.email}</p>
+                                        </div>
+                                        <div className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white border border-white/10">
+                                            Pendente
+                                        </div>
                                     </div>
-                                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                                        Pendente
-                                    </Badge>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="pt-4 space-y-4">
-                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div className="bg-gray-50 p-2 rounded-lg">
-                                        <span className="text-gray-500 text-xs block uppercase font-bold">Posição</span>
-                                        <span className="font-medium">{athlete.posicao}</span>
-                                    </div>
-                                    <div className="bg-gray-50 p-2 rounded-lg">
-                                        <span className="text-gray-500 text-xs block uppercase font-bold">Número</span>
-                                        <span className="font-medium">#{athlete.numero}</span>
-                                    </div>
-                                </div>
 
-                                <div className="flex gap-2 pt-2">
-                                    <button className="aprovar-button flex-1" onClick={() => handleApprove(athlete.id)}>
-                                        <span className="aprovar-button-shadow"></span>
-                                        <span className="aprovar-button-edge"></span>
-                                        <span className="aprovar-button-front text-white flex items-center justify-center gap-2">
-                                            <Check className="w-4 h-4" />
-                                            Aprovar
-                                        </span>
-                                    </button>
-                                    <Button
-                                        variant="destructive"
-                                        size="icon"
-                                        onClick={() => handleReject(athlete.id)}
-                                        title="Rejeitar"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
+                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                        <div className="bg-white/10 backdrop-blur-sm p-3 rounded-2xl border border-white/5">
+                                            <span className="text-blue-100 text-[10px] block uppercase font-black tracking-widest opacity-70 mb-1">Posição</span>
+                                            <span className="font-bold text-white">{athlete.posicao}</span>
+                                        </div>
+                                        <div className="bg-white/10 backdrop-blur-sm p-3 rounded-2xl border border-white/5">
+                                            <span className="text-blue-100 text-[10px] block uppercase font-black tracking-widest opacity-70 mb-1">Número</span>
+                                            <span className="font-bold text-white">#{athlete.numero}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3 pt-2">
+                                        <button className="aprovar-button flex-1" onClick={() => handleApprove(athlete.id)}>
+                                            <span className="aprovar-button-shadow"></span>
+                                            <span className="aprovar-button-edge"></span>
+                                            <span className="aprovar-button-front text-white flex items-center justify-center gap-2 font-bold text-sm">
+                                                <Check className="w-4 h-4" />
+                                                Aprovar
+                                            </span>
+                                        </button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleReject(athlete.id)}
+                                            className="h-12 w-12 rounded-2xl bg-white/10 hover:bg-red-500/20 text-white hover:text-red-400 border border-white/5"
+                                            title="Rejeitar"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </Button>
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     ))}
                 </div>
             )}

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Eye, ArrowLeft, Flame, Zap, Trophy } from 'lucide-react';
 import { athleteStatsAPI } from '../services/api';
+import { LoadingWave } from './ui/LoadingWave';
 
 interface AtletaStats {
   id: number;
@@ -28,7 +29,6 @@ export function TrainerAthleteStatsView() {
 
   async function loadAtletasList() {
     try {
-      const headers: Record<string, string> = { 'Accept': 'application/json' };
       const data = await athleteStatsAPI.getPublicStats();
 
       if (data.success && data.data.length > 0) {
@@ -108,11 +108,9 @@ export function TrainerAthleteStatsView() {
       </div>
 
       {loading ? (
-        <Card className="p-6 text-center">
-          <CardContent>
-            <p className="text-gray-500">Carregando...</p>
-          </CardContent>
-        </Card>
+        <div className="flex justify-center py-20">
+          <LoadingWave />
+        </div>
       ) : atletasList.length === 0 ? (
         <Card className="p-6 text-center">
           <CardContent>
@@ -120,30 +118,43 @@ export function TrainerAthleteStatsView() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
-          {atletasList.map((atleta) => (
-            <Card key={atleta.id} className="p-4 hover:shadow-lg transition-shadow">
-              <CardContent>
-                <div className="flex justify-between items-center">
+        <div className="grid md:grid-cols-2 gap-8">
+          {atletasList.map((atleta: AtletaStats) => (
+            <div key={atleta.id} className="play-tip-card">
+              <div className="play-tip-content">
+                <div className="flex flex-col w-full h-full justify-between gap-4">
                   <div>
-                    <h3 className="font-bold text-lg">{atleta.nome}</h3>
-                    <p className="text-gray-600">{atleta.equipa}</p>
-                    <div className="flex gap-4 mt-2 text-sm">
-                      <span>⚽ {atleta.golos_marcados} golos</span>
-                      <span>🎮 {atleta.jogos} jogos</span>
-                      <span>📊 {atleta.media_golos} média</span>
+                    <h3 className="font-bold text-2xl">{atleta.nome}</h3>
+                    <p className="text-blue-100 flex items-center gap-2">
+                      {atleta.equipa}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-sm">
+                        <Flame className="w-3.5 h-3.5 text-red-300" />
+                        <span>{atleta.golos_marcados} golos</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-sm">
+                        <Zap className="w-3.5 h-3.5 text-green-300" />
+                        <span>{atleta.jogos} jogos</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-sm">
+                        <Trophy className="w-3.5 h-3.5 text-yellow-300" />
+                        <span>{atleta.media_golos} média</span>
+                      </div>
                     </div>
                   </div>
+
                   <Button
                     onClick={() => setSelectedAtleta(atleta)}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-transparent border-white/40 text-white hover:bg-white/20 group font-semibold shadow-none mt-2"
                   >
-                    <Eye className="w-4 h-4 mr-2" />
+                    <Eye className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Ver Detalhes
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -179,9 +178,9 @@ export function Login({ onBack }: LoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-8 px-4">
       <div className="w-full max-w-[500px]">
-        <Button variant="ghost" onClick={onBack} className="mb-4 text-gray-600 hover:text-gray-900">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-        </Button>
+        <button onClick={onBack} className="voltar-button" style={{ marginBottom: '1rem', cursor: 'pointer' }}>
+          <ArrowLeft style={{ width: '16px', height: '16px', display: 'inline-block', marginRight: '8px' }} /> Voltar
+        </button>
 
         <div className="custom-login-container bg-white">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

@@ -1,14 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Plus, BookOpen, Loader2, Trash2, Lightbulb, Search, LayoutGrid, Flame, MoveHorizontal, Target, Shield, Map as MapIcon } from 'lucide-react';
+import { Tabs, TabsContent } from './ui/tabs';
+import { Plus, BookOpen, Loader2, Trash2, Lightbulb, LayoutGrid, Flame, MoveHorizontal, Target, Shield, Map as MapIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApp } from '../context/AppContext';
 import { tipsAPI } from '../services/api';
@@ -120,71 +119,73 @@ export function TipsSection() {
           <h2 className="text-2xl font-bold tracking-tight">Dicas Técnicas</h2>
           <p className="text-gray-600">Aprenda e partilhe técnicas e conhecimentos</p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Dica
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Criar Nova Dica</DialogTitle>
-              <DialogDescription>Partilhe o seu conhecimento técnico</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
+        {user.tipo !== 'admin' && user.tipo !== 'root' && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="btn-create-play w-full sm:w-auto h-auto">
+                <Plus className="w-5 h-5 mr-3" />
+                Nova Dica
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Criar Nova Dica</DialogTitle>
+                <DialogDescription>Partilhe o seu conhecimento técnico</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Título *</Label>
+                    <Input
+                      placeholder="Ex: Mudança de direção"
+                      value={newTipTitle}
+                      onChange={(e) => setNewTipTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Categoria *</Label>
+                    <Select value={newTipCategory} onValueChange={setNewTipCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="finta">Fintas</SelectItem>
+                        <SelectItem value="drible">Dribles</SelectItem>
+                        <SelectItem value="remate">Remates</SelectItem>
+                        <SelectItem value="defesa">Defesa</SelectItem>
+                        <SelectItem value="táctica">Tácticas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label>Título *</Label>
+                  <Label>Descrição Curta *</Label>
                   <Input
-                    placeholder="Ex: Mudança de direção"
-                    value={newTipTitle}
-                    onChange={(e) => setNewTipTitle(e.target.value)}
+                    placeholder="Resumo rápido da técnica..."
+                    value={newTipDescription}
+                    onChange={(e) => setNewTipDescription(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Categoria *</Label>
-                  <Select value={newTipCategory} onValueChange={setNewTipCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="finta">Fintas</SelectItem>
-                      <SelectItem value="drible">Dribles</SelectItem>
-                      <SelectItem value="remate">Remates</SelectItem>
-                      <SelectItem value="defesa">Defesa</SelectItem>
-                      <SelectItem value="táctica">Tácticas</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Conteúdo Detalhado *</Label>
+                  <Textarea
+                    placeholder="Explicação passo a passo..."
+                    rows={8}
+                    value={newTipContent}
+                    onChange={(e) => setNewTipContent(e.target.value)}
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Descrição Curta *</Label>
-                <Input
-                  placeholder="Resumo rápido da técnica..."
-                  value={newTipDescription}
-                  onChange={(e) => setNewTipDescription(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Conteúdo Detalhado *</Label>
-                <Textarea
-                  placeholder="Explicação passo a passo..."
-                  rows={8}
-                  value={newTipContent}
-                  onChange={(e) => setNewTipContent(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleCreateTip} disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Publicar Dica
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
+                <Button onClick={handleCreateTip} disabled={isSubmitting}>
+                  {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Publicar Dica
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* TABS DE CATEGORIA - ESTILO CUSTOMIZADO */}
@@ -221,40 +222,38 @@ export function TipsSection() {
           ) : (
             <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
               {filteredTips.map((tip: TipDisplay) => (
-                <Card key={tip.id} className="flex flex-col hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
+                <div key={tip.id} className="play-tip-card">
+                  <div className="play-tip-content">
+                    <div className="flex justify-between items-start w-full">
                       <div className="flex gap-2">
-                        <Badge variant="secondary" className="capitalize">{tip.categoria}</Badge>
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge className="bg-white/20 text-white hover:bg-white/30 border-none capitalize">{tip.categoria}</Badge>
+                        <Badge variant="outline" className="text-[10px] text-white border-white/40">
                           {tip.autorTipo}
                         </Badge>
                       </div>
 
-                      {/* ✅ BOTÃO APAGAR CONDICIONAL */}
                       {canModifyTip(tip) && (
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteTip(tip.id)}
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                          className="h-8 w-8 p-0 text-white hover:bg-white/20"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
-                    <CardTitle className="text-xl mt-3 line-clamp-1">{tip.titulo}</CardTitle>
-                    <CardDescription>por {tip.autorNome} • {tip.equipa}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    <p className="text-sm text-gray-600 line-clamp-3 italic">
+
+                    <h3 className="text-xl font-bold mt-3 line-clamp-1">{tip.titulo}</h3>
+                    <p className="text-sm text-blue-100">por {tip.autorNome} • {tip.equipa}</p>
+
+                    <p className="play-tip-para line-clamp-3 italic flex-1 py-2">
                       "{tip.descricao}"
                     </p>
-                  </CardContent>
-                  <CardFooter className="pt-4 border-t">
+
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full group">
+                        <Button variant="outline" className="w-full bg-transparent border-white/40 text-white hover:bg-white/20 group">
                           <BookOpen className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                           Ver Detalhes
                         </Button>
@@ -286,8 +285,8 @@ export function TipsSection() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                  </CardFooter>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           )}
