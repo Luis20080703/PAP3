@@ -109,7 +109,7 @@ export function AdminDashboard() {
         try {
             const res = await adminAPI.updateUser(editingUser.id, editUserData);
             if (res.success) {
-                toast.success("Utilizador atualizado");
+                toast.success("Utilizador atual izado");
                 setIsEditUserOpen(false);
                 await loadData();
             }
@@ -245,7 +245,7 @@ export function AdminDashboard() {
                         ))}
                     </TabsList>
                 </div>
-
+                <br />
                 {/* Dashboard Overview */}
                 <TabsContent value="overview" className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -253,10 +253,10 @@ export function TipsSection() {
 
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full bg-transparent border-white/40 text-white hover:bg-white/20 group">
+                        <button className="btn-details w-full group">
                           <BookOpen className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                           Ver Detalhes
-                        </Button>
+                        </button>
                       </DialogTrigger>
                       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
                         <DialogHeader>

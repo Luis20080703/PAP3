@@ -362,14 +362,13 @@ export function PlaysSection() {
 
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full bg-transparent border-white/40 text-white hover:bg-white/20 mt-2"
+                      <button
+                        className="btn-details w-full mt-2"
                         onClick={() => setSelectedPlay(play.id)}
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Ver Detalhes ({play.comentarios.length})
-                      </Button>
+                      </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                       {selectedPlay === play.id && (

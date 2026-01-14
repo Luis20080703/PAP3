@@ -118,7 +118,7 @@ export function Dashboard({ onLogout, onNavigateToPremium }: DashboardProps) {
         </div>
       </header>
 
-      {/* Main Content with Dock for regular users */}
+      {/* Main Content for regular users */}
       <main className="w-full max-w-[1920px] mx-auto py-8 px-4 md:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <DockMenu
