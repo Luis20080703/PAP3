@@ -7,7 +7,7 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent } from './ui/tabs';
-import { Plus, BookOpen, Loader2, Trash2, Lightbulb, LayoutGrid, Flame, MoveHorizontal, Target, Shield, Map as MapIcon } from 'lucide-react';
+import { Plus, BookOpen, Loader2, Trash2, Lightbulb, LayoutGrid, Flame, MoveHorizontal, Target, Shield, Map as MapIcon, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApp } from '../context/AppContext';
 import { tipsAPI } from '../services/api';
@@ -27,6 +27,14 @@ export function TipsSection() {
   const [newTipDescription, setNewTipDescription] = useState('');
   const [newTipCategory, setNewTipCategory] = useState('');
   const [newTipContent, setNewTipContent] = useState('');
+
+  // Estados de Edição
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingTipId, setEditingTipId] = useState<string | null>(null);
+  const [editTipTitle, setEditTipTitle] = useState('');
+  const [editTipDescription, setEditTipDescription] = useState('');
+  const [editTipCategory, setEditTipCategory] = useState('');
+  const [editTipContent, setEditTipContent] = useState('');
 
   if (!user) return null;
 
@@ -91,6 +99,41 @@ export function TipsSection() {
       toast.success('Dica eliminada com sucesso');
     } catch (error) {
       toast.error('Erro ao eliminar a dica');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditClick = (tip: TipDisplay) => {
+    setEditingTipId(tip.id);
+    setEditTipTitle(tip.titulo);
+    setEditTipDescription(tip.descricao);
+    setEditTipCategory(tip.categoria);
+    setEditTipContent(tip.conteudo);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateTip = async () => {
+    if (!editingTipId || !editTipTitle || !editTipDescription || !editTipCategory || !editTipContent) {
+      toast.error('Por favor, preencha todos os campos');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await tipsAPI.update(editingTipId, {
+        titulo: editTipTitle,
+        descricao: editTipDescription,
+        categoria: editTipCategory as any,
+        conteudo: editTipContent
+      });
+      await atualizarDicas();
+      setIsEditDialogOpen(false);
+      setEditingTipId(null);
+      toast.success('Dica atualizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar dica:', error);
+      toast.error('Erro ao atualizar dica');
     } finally {
       setIsSubmitting(false);
     }
@@ -214,7 +257,7 @@ export function TipsSection() {
 
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
         {/* Usamos a TabsList escondida para manter o funcionamento do componente Tabs do Shadcn se necessário, 
-            ou simplesmente removemos e usamos apenas o selectedCategory para controlar os conteúdos */}
+              ou simplesmente removemos e usamos apenas o selectedCategory para controlar os conteúdos */}
 
         <TabsContent value={selectedCategory} className="mt-6">
           {dicasCarregando ? (
@@ -233,14 +276,25 @@ export function TipsSection() {
                       </div>
 
                       {canModifyTip(tip) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteTip(tip.id)}
-                          className="h-8 w-8 p-0 text-white hover:bg-white/20"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditClick(tip)}
+                            disabled={isSubmitting}
+                            className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTip(tip.id)}
+                            className="h-8 w-8 p-0 text-white hover:bg-white/20"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       )}
                     </div>
 
@@ -300,6 +354,67 @@ export function TipsSection() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Dica</DialogTitle>
+            <DialogDescription>Atualize o seu conhecimento técnico</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Título *</Label>
+                <Input
+                  placeholder="Ex: Mudança de direção"
+                  value={editTipTitle}
+                  onChange={(e) => setEditTipTitle(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Categoria *</Label>
+                <Select value={editTipCategory} onValueChange={setEditTipCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="finta">Fintas</SelectItem>
+                    <SelectItem value="drible">Dribles</SelectItem>
+                    <SelectItem value="remate">Remates</SelectItem>
+                    <SelectItem value="defesa">Defesa</SelectItem>
+                    <SelectItem value="táctica">Tácticas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Descrição Curta *</Label>
+              <Input
+                placeholder="Resumo rápido da técnica..."
+                value={editTipDescription}
+                onChange={(e) => setEditTipDescription(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Conteúdo Detalhado *</Label>
+              <Textarea
+                placeholder="Explicação passo a passo..."
+                rows={8}
+                value={editTipContent}
+                onChange={(e) => setEditTipContent(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleUpdateTip} disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Guardar Alterações
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

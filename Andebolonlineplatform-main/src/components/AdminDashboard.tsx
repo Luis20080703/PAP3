@@ -44,6 +44,21 @@ export function AdminDashboard() {
     const [newTeamEscalao, setNewTeamEscalao] = useState('');
     const [isCreatingTeam, setIsCreatingTeam] = useState(false);
 
+    // Edit Team State
+    const [editingTeam, setEditingTeam] = useState<any>(null);
+    const [isEditTeamOpen, setIsEditTeamOpen] = useState(false);
+    const [editTeamData, setEditTeamData] = useState({ nome: '' });
+
+    // Edit Play State
+    const [editingPlay, setEditingPlay] = useState<any>(null);
+    const [isEditPlayOpen, setIsEditPlayOpen] = useState(false);
+    const [editPlayData, setEditPlayData] = useState({ titulo: '', descricao: '' });
+
+    // Edit Tip State
+    const [editingTip, setEditingTip] = useState<any>(null);
+    const [isEditTipOpen, setIsEditTipOpen] = useState(false);
+    const [editTipData, setEditTipData] = useState({ titulo: '', conteudo: '', categoria: '' });
+
     const loadData = async () => {
         setLoading(true);
         try {
@@ -109,7 +124,7 @@ export function AdminDashboard() {
         try {
             const res = await adminAPI.updateUser(editingUser.id, editUserData);
             if (res.success) {
-                toast.success("Utilizador atual izado");
+                toast.success("Utilizador atualizado");
                 setIsEditUserOpen(false);
                 await loadData();
             }
@@ -156,6 +171,72 @@ export function AdminDashboard() {
             toast.error("Erro ao remover equipa");
         }
     };
+
+    const handleOpenEditTeam = (team: any) => {
+        setEditingTeam(team);
+        setEditTeamData({ nome: team.nome });
+        setIsEditTeamOpen(true);
+    };
+
+    const handleUpdateTeam = async () => {
+        if (!editingTeam) return;
+        try {
+            // Check if equipasAPI has update method (we just added it)
+            const res = await equipasAPI.update(editingTeam.id, { nome: editTeamData.nome });
+            if (res.success) {
+                toast.success("Equipa atualizada com sucesso!");
+                setIsEditTeamOpen(false);
+                await loadData();
+            }
+        } catch (error) {
+            toast.error("Erro ao atualizar equipa");
+        }
+    };
+
+    const handleOpenEditPlay = (play: any) => {
+        setEditingPlay(play);
+        setEditPlayData({ titulo: play.titulo, descricao: play.descricao });
+        setIsEditPlayOpen(true);
+    };
+
+    const handleUpdatePlay = async () => {
+        if (!editingPlay) return;
+        try {
+            const res = await playsAPI.update(editingPlay.id, editPlayData);
+            if (res) {
+                toast.success("Jogada atualizada com sucesso!");
+                setIsEditPlayOpen(false);
+                await loadData();
+            }
+        } catch (error) {
+            toast.error("Erro ao atualizar jogada");
+        }
+    };
+
+    const handleOpenEditTip = (tip: any) => {
+        setEditingTip(tip);
+        setEditTipData({
+            titulo: tip.titulo || '',
+            conteudo: tip.conteudo || tip.texto || '',
+            categoria: tip.categoria
+        });
+        setIsEditTipOpen(true);
+    };
+
+    const handleUpdateTip = async () => {
+        if (!editingTip) return;
+        try {
+            const res = await tipsAPI.update(editingTip.id, editTipData);
+            if (res) {
+                toast.success("Dica atualizada com sucesso!");
+                setIsEditTipOpen(false);
+                await loadData();
+            }
+        } catch (error) {
+            toast.error("Erro ao atualizar dica");
+        }
+    };
+
 
     const handleValidate = async (id: number) => {
         try {
@@ -248,440 +329,735 @@ export function AdminDashboard() {
                 <br />
                 {/* Dashboard Overview */}
                 <TabsContent value="overview" className="space-y-8">
+                    {/* Stats Cards - Retro Format */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            { label: 'Utilizadores', val: stats?.users, icon: Users, color: 'indigo' },
-                            { label: 'Atletas', val: stats?.atletas, icon: Activity, color: 'emerald' },
-                            { label: 'Equipas', val: equipas.length, icon: Trophy, color: 'amber' },
-                            { label: 'Pendentes', val: stats?.pendentes, icon: AlertTriangle, color: 'rose' }
-                        ].map((item, idx) => (
-                            <Card key={idx} className="border-none shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group rounded-[32px] bg-white">
-                                <CardContent className="p-8 flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">{item.label}</p>
-                                        <h3 className="text-5xl font-black text-gray-900 tracking-tighter">{item.val ?? '--'}</h3>
+                        {/* Utilizadores */}
+                        <div className="retro-card shadow-2xl mb-0">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-2">
+                                    <Users className="w-4 h-4 text-indigo-500" />
+                                    UTILIZADORES
+                                </span>
+                            </div>
+                            <div className="bg-white border-x border-b border-gray-300 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="w-14 h-14 rounded-lg bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm">
+                                        <Users className="w-7 h-7" />
                                     </div>
-                                    <div className={`p-5 rounded-[24px] group-hover:rotate-12 transition-all duration-500 bg-gray-50 text-indigo-600 shadow-sm`}>
-                                        <item.icon className="w-10 h-10" />
+                                    <div className="text-4xl font-black text-gray-900 font-mono">{stats?.users ?? '--'}</div>
+                                </div>
+                                <p className="text-xs text-gray-500 font-mono mt-3 uppercase tracking-wide">Total de contas</p>
+                            </div>
+                        </div>
+
+                        {/* Atletas */}
+                        <div className="retro-card shadow-2xl mb-0">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-emerald-500" />
+                                    ATLETAS
+                                </span>
+                            </div>
+                            <div className="bg-white border-x border-b border-gray-300 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="w-14 h-14 rounded-lg bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center text-emerald-600 shadow-sm">
+                                        <Activity className="w-7 h-7" />
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                    <div className="text-4xl font-black text-gray-900 font-mono">{stats?.atletas ?? '--'}</div>
+                                </div>
+                                <p className="text-xs text-gray-500 font-mono mt-3 uppercase tracking-wide">Jogadores ativos</p>
+                            </div>
+                        </div>
+
+                        {/* Equipas */}
+                        <div className="retro-card shadow-2xl mb-0">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-2">
+                                    <Trophy className="w-4 h-4 text-amber-500" />
+                                    EQUIPAS
+                                </span>
+                            </div>
+                            <div className="bg-white border-x border-b border-gray-300 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="w-14 h-14 rounded-lg bg-amber-100 border-2 border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
+                                        <Trophy className="w-7 h-7" />
+                                    </div>
+                                    <div className="text-4xl font-black text-gray-900 font-mono">{equipas.length}</div>
+                                </div>
+                                <p className="text-xs text-gray-500 font-mono mt-3 uppercase tracking-wide">Clubes registados</p>
+                            </div>
+                        </div>
+
+                        {/* Pendentes */}
+                        <div className="retro-card shadow-2xl mb-0">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4 text-rose-500" />
+                                    PENDENTES
+                                </span>
+                            </div>
+                            <div className="bg-white border-x border-b border-gray-300 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="w-14 h-14 rounded-lg bg-rose-100 border-2 border-rose-200 flex items-center justify-center text-rose-600 shadow-sm">
+                                        <AlertTriangle className="w-7 h-7" />
+                                    </div>
+                                    <div className="text-4xl font-black text-gray-900 font-mono">{stats?.pendentes ?? '--'}</div>
+                                </div>
+                                <p className="text-xs text-gray-500 font-mono mt-3 uppercase tracking-wide">Aguardam validação</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Quick Charts Placeholder or Reports Section could go here */}
+                    {/* Platform Status & Actions - Retro Cards */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <Card className="border-none shadow-xl rounded-[40px] bg-gradient-to-br from-indigo-600 to-indigo-900 text-black overflow-hidden p-10 relative">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[80px] rounded-full -mr-20 -mt-20"></div>
-                            <h3 className="text-2xl font-black mb-4 relative z-10 flex items-center gap-3">
-                                <Zap className="w-8 h-8 text-amber-400" />
-                                Estado da Plataforma
-                            </h3>
-                            <p className="text-black/10 font-medium max-w-sm mb-8 leading-relaxed relative z-10 ">
-                                A plataforma está a operar com 100% de disponibilidade. Todos os serviços de análise e estatística estão ativos.
-                            </p>
-                            <div className="flex gap-4">
-                                <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl flex-1 border border-white/10">
-                                    <p className="text-xs font-bold text-indigo-200 uppercase tracking-widest mb-1">Conteúdo</p>
-                                    <p className="text-2xl font-black">{(stats?.jogadas || 0) + (stats?.dicas || 0)}</p>
-                                </div>
-                                <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl flex-1 border border-white/10">
-                                    <p className="text-xs font-bold text-indigo-200 uppercase tracking-widest mb-1">Comentários</p>
-                                    <p className="text-2xl font-black">{stats?.comentarios || 0}</p>
+                        {/* Estado da Plataforma */}
+                        <div className="retro-card shadow-2xl mb-0">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-2">
+                                    <Zap className="w-4 h-4 text-amber-400" />
+                                    ESTADO DA PLATAFORMA
+                                </span>
+                            </div>
+                            <div className="bg-gradient-to-br from-indigo-600 to-indigo-900 border-x border-b border-indigo-300 p-6">
+                                <p className="text-white text-xs mb-4 font-mono leading-relaxed">
+                                    Sistema operacional a 100%. Todos os serviços de análise e estatística estão ativos.
+                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-white/10 backdrop-blur-md p-4 rounded border border-white/20">
+                                        <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">Conteúdo</p>
+                                        <p className="text-2xl font-black text-white font-mono">{(stats?.jogadas || 0) + (stats?.dicas || 0)}</p>
+                                    </div>
+                                    <div className="bg-white/10 backdrop-blur-md p-4 rounded border border-white/20">
+                                        <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">Comentários</p>
+                                        <p className="text-2xl font-black text-white font-mono">{stats?.comentarios || 0}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </Card>
+                        </div>
 
-                        <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden p-10">
-                            <h3 className="text-2xl font-black mb-6 text-gray-900 flex items-center gap-3">
-                                <Shield className="w-8 h-8 text-indigo-500" />
-                                Ações Recomendadas
-                            </h3>
-                            <div className="space-y-4">
+                        {/* Ações Recomendadas */}
+                        <div className="retro-card shadow-2xl mb-0">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-2">
+                                    <Shield className="w-4 h-4 text-indigo-500" />
+                                    AÇÕES RECOMENDADAS
+                                </span>
+                            </div>
+                            <div className="bg-white border-x border-b border-gray-300 p-6">
                                 {pending.length > 0 ? (
-                                    <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100 flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600">
-                                                <UserPlus className="w-6 h-6" />
+                                    <div className="bg-amber-50 p-5 rounded border-2 border-amber-200">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-10 h-10 bg-amber-100 rounded flex items-center justify-center text-amber-600">
+                                                <UserPlus className="w-5 h-5" />
                                             </div>
-                                            <div>
-                                                <p className="font-black text-gray-900">{pending.length} Treinadores a aguardar</p>
-                                                <p className="text-sm text-gray-500 font-medium">Verifica as credenciais para validar acesso.</p>
+                                            <div className="flex-1">
+                                                <p className="font-black text-gray-900 text-sm">{pending.length} utilizador{pending.length > 1 ? 'es' : ''} a aguardar</p>
+                                                <p className="text-xs text-gray-600 font-mono">Verifica as credenciais</p>
                                             </div>
                                         </div>
                                         <Button
                                             onClick={() => setActiveTab('users')}
-                                            className="bg-amber-500 hover:bg-amber-600 rounded-xl font-bold px-6"
+                                            className="bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs rounded-sm shadow-md w-full uppercase tracking-wider"
                                         >
                                             Ver Agora
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className="bg-green-50 p-6 rounded-3xl border border-green-100 flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600">
-                                            <Check className="w-6 h-6" />
-                                        </div>
-                                        <div>
-                                            <p className="font-black text-gray-900">Tudo em ordem</p>
-                                            <p className="text-sm text-gray-500 font-medium">Não existem pendentes de validação neste momento.</p>
+                                    <div className="bg-green-50 p-5 rounded border-2 border-green-200">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-green-100 rounded flex items-center justify-center text-green-600">
+                                                <Check className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-gray-900 text-sm">Tudo em ordem</p>
+                                                <p className="text-xs text-gray-600 font-mono">Sem pendentes</p>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
                             </div>
-                        </Card>
+                        </div>
                     </div>
                 </TabsContent>
 
                 {/* Users Management */}
                 <TabsContent value="users" className="space-y-6">
-                    <Card className="border-none shadow-2xl rounded-[40px] overflow-hidden bg-white">
-                        <CardHeader className="p-10 border-b border-gray-50 bg-gray-50/20">
-                            <CardTitle className="flex items-center gap-4 text-3xl font-black">
-                                <Users className="w-10 h-10 text-indigo-500" />
-                                Gestão de Utilizadores
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader className="bg-gray-50/50">
-                                        <TableRow>
-                                            <TableHead className="font-black py-6 pl-10 text-gray-400 uppercase tracking-widest text-xs">UTILIZADOR</TableHead>
-                                            <TableHead className="font-black text-gray-400 uppercase tracking-widest text-xs">ACESSO / EQUIPA</TableHead>
-                                            <TableHead className="font-black text-gray-400 uppercase tracking-widest text-xs">PREMIUM</TableHead>
-                                            <TableHead className="font-black text-gray-400 uppercase tracking-widest text-xs">ESTADO</TableHead>
-                                            <TableHead className="text-right font-black pr-10 text-gray-400 uppercase tracking-widest text-xs">GESTOR</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {allUsers.map((u) => (
-                                            <TableRow key={u.id} className="hover:bg-indigo-50/20 transition-all border-b border-gray-50 duration-300">
-                                                <TableCell className="py-8 pl-10">
-                                                    <div className="flex items-center gap-5">
-                                                        <div className="w-16 h-16 rounded-[22px] bg-gradient-to-tr from-indigo-100 to-indigo-200 flex items-center justify-center text-indigo-700 font-black text-2xl shadow-inner border-2 border-white">
-                                                            {u.nome.charAt(0).toUpperCase()}
-                                                        </div>
-                                                        <div className="space-y-0.5">
-                                                            <p className="font-black text-gray-900 text-xl tracking-tight">{u.nome}</p>
-                                                            <p className="text-sm text-gray-400 font-bold">{u.email}</p>
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="space-y-2">
-                                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${u.tipo === 'admin' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                                            u.tipo === 'treinador' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-blue-50 text-blue-600 border-blue-100'
-                                                            }`}>
-                                                            {u.tipo}
+                    {/* Gestão de Utilizadores - Retro Format */}
+                    <div className="retro-card shadow-2xl">
+                        <div className="retro-card__title">
+                            <span className="flex items-center gap-3">
+                                <Users className="w-5 h-5 text-gray-300" />
+                                GESTÃO DE UTILIZADORES
+                            </span>
+                            <span className="text-xs font-mono opacity-50">{allUsers.length} RECORDS</span>
+                        </div>
+                        <div className="retro-card__data">
+                            {/* Left Column: User Details */}
+                            <div className="retro-card__right">
+                                <div className="retro-item retro-header">
+                                    IDENTIFICAÇÃO / CARGO
+                                </div>
+                                {allUsers.map((u) => (
+                                    <div key={u.id} className="retro-item">
+                                        <div className="flex items-center gap-4 w-full">
+                                            <div className="w-12 h-12 rounded-lg bg-gray-200 border-2 border-gray-300 flex items-center justify-center text-gray-600 font-black text-xl shrink-0">
+                                                {u.nome.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <p className="font-bold text-gray-900 text-sm truncate leading-none">{u.nome}</p>
+                                                    {u.equipa && (
+                                                        <span className="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded border border-gray-200 font-mono truncate max-w-[100px]">
+                                                            {u.equipa}
                                                         </span>
-                                                        <p className="text-xs text-gray-400 font-black ml-1 flex items-center gap-1.5">
-                                                            <Activity className="w-3 h-3" /> {u.equipa || 'Sem Equipa'}
-                                                        </p>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <button
-                                                        onClick={() => handleTogglePremium(u.id)}
-                                                        className={`group flex items-center gap-2 px-4 py-2 rounded-2xl transition-all font-black text-xs uppercase tracking-widest border ${u.is_premium
-                                                            ? 'bg-amber-100 text-amber-600 border-amber-200 shadow-sm shadow-amber-200/50'
-                                                            : 'bg-gray-100 text-gray-400 border-gray-200'
-                                                            }`}
-                                                    >
-                                                        <Zap className={`w-4 h-4 ${u.is_premium ? 'fill-amber-500 animate-pulse' : ''}`} />
-                                                        {u.is_premium ? 'Elite' : 'Padrão'}
-                                                    </button>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {u.validado ? (
-                                                        <div className="flex items-center gap-2 text-green-600 font-black text-xs uppercase tracking-widest">
-                                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                                            Autorizado
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center gap-2 text-amber-500 font-black text-xs uppercase tracking-widest">
-                                                            <div className="w-2 h-2 rounded-full bg-amber-500" />
-                                                            Bloqueado
-                                                        </div>
                                                     )}
-                                                </TableCell>
-                                                <TableCell className="text-right pr-10">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        {!u.validado && (u.tipo === 'treinador' || u.tipo === 'atleta') && (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => handleValidate(u.id)}
-                                                                className="validar-button"
-                                                            >
-                                                                Validar
-                                                            </Button>
-                                                        )}
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleOpenEditUser(u)}
-                                                            className="text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all h-11 w-11"
-                                                        >
-                                                            <User className="w-6 h-6" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDeleteUser(u.id)}
-                                                            className="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all h-11 w-11"
-                                                        >
-                                                            <Trash2 className="w-6 h-6" />
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                                </div>
+                                                <p className="text-xs text-gray-500 font-mono truncate mb-1.5">{u.email}</p>
+                                                <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                                                    u.tipo === 'treinador' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                                        'bg-blue-100 text-blue-700 border-blue-200'
+                                                    }`}>
+                                                    {u.tipo}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        </CardContent>
-                    </Card>
+
+                            {/* Right Column: Status & Actions */}
+                            <div className="retro-card__left">
+                                <div className="retro-item retro-header justify-end">
+                                    ESTADO / AÇÕES
+                                </div>
+                                {allUsers.map((u) => (
+                                    <div key={u.id} className="retro-item justify-end gap-2">
+
+                                        {/* Status Badge */}
+                                        <div className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded border text-[10px] font-bold uppercase tracking-wider mr-2 ${u.validado ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
+                                            }`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full ${u.validado ? 'bg-green-500' : 'bg-red-500'}`} />
+                                            {u.validado ? 'Ativo' : 'Bloq'}
+                                        </div>
+
+                                        {/* Premium Toggle */}
+                                        <button
+                                            onClick={() => handleTogglePremium(u.id)}
+                                            className={`h-8 px-2 rounded border text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 ${u.is_premium
+                                                ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
+                                                : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                                                }`}
+                                            title="Toggle Premium"
+                                        >
+                                            <Zap className={`w-3 h-3 ${u.is_premium ? 'fill-amber-600' : ''}`} />
+                                            <span className="hidden lg:inline">{u.is_premium ? 'Elite' : 'Std'}</span>
+                                        </button>
+
+                                        <div className="h-4 w-px bg-gray-200 mx-1"></div>
+
+                                        {/* Validate Action */}
+                                        {!u.validado && (u.tipo === 'treinador' || u.tipo === 'atleta') && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleValidate(u.id)}
+                                                className="h-8 w-8 p-0 sm:w-auto sm:px-3 text-green-600 border-green-200 hover:bg-green-50"
+                                            >
+                                                <Check className="w-4 h-4 sm:mr-1" />
+                                                <span className="hidden sm:inline text-[10px] font-bold uppercase">Validar</span>
+                                            </Button>
+                                        )}
+
+                                        {/* Edit/Delete */}
+                                        <div className="flex items-center bg-gray-100 rounded-md border border-gray-200">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleOpenEditUser(u)}
+                                                className="h-8 w-8 text-gray-500 hover:text-indigo-600 hover:bg-white rounded-none border-r border-gray-200"
+                                            >
+                                                <User className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDeleteUser(u.id)}
+                                                className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-white rounded-none"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Edit User Dialog */}
                     <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-                        <DialogContent className="sm:max-w-[425px] rounded-[32px] border-none shadow-2xl">
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-black">Editar Utilizador</DialogTitle>
-                                <DialogDescription className="text-gray-500 font-medium"> Modificar perfil de {editingUser?.nome} </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-6 py-6">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-bold text-gray-700 ml-1">Nome Completo</Label>
-                                    <Input
-                                        value={editUserData.nome}
-                                        onChange={(e) => setEditUserData({ ...editUserData, nome: e.target.value })}
-                                        className="rounded-xl py-6"
-                                    />
+                        <DialogContent className="sm:max-w-[425px] p-0 bg-transparent border-none shadow-none">
+                            <div className="retro-card mb-0 shadow-2xl">
+                                <div className="retro-card__title">
+                                    <span className="flex items-center gap-3">
+                                        <User className="w-5 h-5 text-indigo-500" />
+                                        EDITAR UTILIZADOR
+                                    </span>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-bold text-gray-700 ml-1">Cargo / Tipo</Label>
-                                    <Select value={editUserData.tipo} onValueChange={(val: string) => setEditUserData({ ...editUserData, tipo: val })}>
-                                        <SelectTrigger className="rounded-xl py-6">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="rounded-2xl">
-                                            <SelectItem value="atleta">Atleta</SelectItem>
-                                            <SelectItem value="treinador">Treinador</SelectItem>
-                                            <SelectItem value="admin">Administrador</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-bold text-gray-700 ml-1">Equipa Filiada</Label>
-                                    <Input
-                                        value={editUserData.equipa}
-                                        onChange={(e) => setEditUserData({ ...editUserData, equipa: e.target.value })}
-                                        className="rounded-xl py-6"
-                                        placeholder="Nome da equipa"
-                                    />
+                                <div className="bg-white border-x border-b border-gray-300 p-6 flex flex-col gap-5">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Nome Completo</Label>
+                                        <Input
+                                            value={editUserData.nome}
+                                            onChange={(e) => setEditUserData({ ...editUserData, nome: e.target.value })}
+                                            className="font-mono border-2 border-gray-200 focus:border-indigo-500 rounded-none bg-gray-50 h-12"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Cargo</Label>
+                                        <Select value={editUserData.tipo} onValueChange={(val: string) => setEditUserData({ ...editUserData, tipo: val })}>
+                                            <SelectTrigger className="font-mono border-2 border-gray-200 focus:border-indigo-500 rounded-none bg-gray-50 h-12">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="font-mono border-2 border-gray-200 rounded-none">
+                                                <SelectItem value="atleta">Atleta</SelectItem>
+                                                <SelectItem value="treinador">Treinador</SelectItem>
+                                                <SelectItem value="admin">Administrador</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Equipa</Label>
+                                        <Input
+                                            value={editUserData.equipa}
+                                            onChange={(e) => setEditUserData({ ...editUserData, equipa: e.target.value })}
+                                            className="font-mono border-2 border-gray-200 focus:border-indigo-500 rounded-none bg-gray-50 h-12"
+                                            placeholder="Nome da equipa"
+                                        />
+                                    </div>
+
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <Button
+                                            onClick={handleUpdateUser}
+                                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-mono font-bold w-full h-12 rounded-sm shadow-md uppercase tracking-wider"
+                                        >
+                                            Guardar Alterações
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                            <DialogFooter>
-                                <Button
-                                    onClick={handleUpdateUser}
-                                    className="bg-indigo-600 hover:bg-indigo-700 rounded-xl w-full py-6 font-black shadow-lg"
-                                >
-                                    Guardar Alterações
-                                </Button>
-                            </DialogFooter>
                         </DialogContent>
                     </Dialog>
                 </TabsContent>
 
                 {/* Equipas Management */}
                 <TabsContent value="equipas" className="space-y-6">
-                    <Card className="border-none shadow-2xl rounded-[40px] overflow-hidden bg-white">
-                        <CardHeader className="p-10 border-b border-gray-50 bg-gray-50/30 flex flex-row items-center justify-between">
-                            <CardTitle className="flex items-center gap-4 text-3xl font-black">
-                                <Trophy className="w-10 h-10 text-amber-500" />
-                                Gestão do Ecossistema
-                            </CardTitle>
-
-                            <Dialog open={isTeamDialogOpen} onOpenChange={setIsTeamDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button className="equipaadm-button">
-                                        <Plus className="equipaadm-button__icon" />
-                                        Criar Equipa
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px] rounded-[32px] border-none shadow-2xl">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-2xl font-black">Criar Nova Equipa</DialogTitle>
-                                        <DialogDescription className="text-gray-500 font-medium">
-                                            Adicione uma nova equipa ao ecossistema NexusHand.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="grid gap-6 py-6">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="name" className="text-sm font-bold text-gray-700 ml-1">Nome da Equipa</Label>
-                                            <Input
-                                                id="name"
-                                                value={newTeamName}
-                                                onChange={(e) => setNewTeamName(e.target.value)}
-                                                className="rounded-xl border-gray-100 bg-gray-50/50 py-6"
-                                                placeholder="Ex: FC Porto"
-                                            />
-                                        </div>
-                                    </div>
-                                    <DialogFooter className="gap-3">
-                                        <Button
-                                            variant="ghost"
-                                            onClick={() => setIsTeamDialogOpen(false)}
-                                            disabled={isCreatingTeam}
-                                            className="rounded-xl font-bold"
-                                        >
-                                            Cancelar
+                    {/* Gestão do Ecossistema - Retro Format */}
+                    <div className="retro-card shadow-2xl">
+                        <div className="retro-card__title">
+                            <span className="flex items-center gap-3">
+                                <Trophy className="w-5 h-5 text-amber-500" />
+                                GESTÃO DO ECOSSISTEMA
+                            </span>
+                            <div className="flex items-center gap-4">
+                                <span className="text-xs font-mono opacity-50">{equipas.length} EQUIPAS</span>
+                                <Dialog open={isTeamDialogOpen} onOpenChange={setIsTeamDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button size="sm" className="h-8 bg-amber-500 hover:bg-amber-600 text-white font-bold border-none">
+                                            <Plus className="w-4 h-4 mr-1" />
+                                            Criar Equipa
                                         </Button>
-                                        <button
-                                            onClick={handleCreateTeam}
-                                            disabled={isCreatingTeam}
-                                            className="criarequipa-button"
-                                        >
-                                            {isCreatingTeam ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                                <>
-                                                    Criar Equipa
-                                                    <svg className="criarequipa-buttonicon" viewBox="0 0 24 24" fill="currentColor">
-                                                        <path
-                                                            fillRule="evenodd"
-                                                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z"
-                                                            clipRule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                </>
-                                            )}
-                                        </button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader className="bg-gray-50/50">
-                                        <TableRow>
-                                            <TableHead className="font-black py-6 pl-10 text-gray-400 uppercase tracking-widest text-xs">IDENTIFICAÇÃO DA EQUIPA</TableHead>
-                                            <TableHead className="text-right font-black pr-10 text-gray-400 uppercase tracking-widest text-xs">OPERAÇÕES</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {equipas.map((e) => (
-                                            <TableRow key={e.id} className="hover:bg-amber-50/10 transition-all border-b border-gray-50 duration-300">
-                                                <TableCell className="py-8 pl-10">
-                                                    <div className="flex items-center gap-5">
-                                                        <div className="w-16 h-16 rounded-[22px] bg-gradient-to-tr from-amber-100 to-amber-200 flex items-center justify-center text-amber-700 font-black text-2xl shadow-inner border-2 border-white">
-                                                            {e.nome.charAt(0).toUpperCase()}
-                                                        </div>
-                                                        <p className="font-black text-gray-900 text-xl tracking-tight">{e.nome}</p>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right pr-10">
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px] p-0 bg-transparent border-none shadow-none">
+                                        <div className="retro-card mb-0 shadow-2xl">
+                                            <div className="retro-card__title">
+                                                <span className="flex items-center gap-3">
+                                                    <Plus className="w-5 h-5 text-amber-500" />
+                                                    CRIAR NOVA EQUIPA
+                                                </span>
+                                            </div>
+                                            <div className="bg-white border-x border-b border-gray-300 p-6 flex flex-col gap-6">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="name" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Nome da Equipa</Label>
+                                                    <Input
+                                                        id="name"
+                                                        value={newTeamName}
+                                                        onChange={(e) => setNewTeamName(e.target.value)}
+                                                        className="font-mono border-2 border-gray-200 focus:border-amber-500 rounded-none bg-gray-50 h-12"
+                                                        placeholder="Ex: FC Porto"
+                                                    />
+                                                </div>
+                                                <div className="flex justify-end gap-3 pt-2">
                                                     <Button
                                                         variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDeleteTeam(e.id)}
-                                                        className="h-11 w-11 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                        onClick={() => setIsTeamDialogOpen(false)}
+                                                        disabled={isCreatingTeam}
+                                                        className="font-mono font-bold text-gray-500 hover:text-gray-900"
                                                     >
-                                                        <Trash2 className="w-6 h-6" />
+                                                        CANCELAR
                                                     </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                                    <button
+                                                        onClick={handleCreateTeam}
+                                                        disabled={isCreatingTeam}
+                                                        className="bg-amber-500 text-white font-mono font-bold px-4 py-2 rounded-sm shadow-md active:translate-y-0.5 transition-all flex items-center gap-2"
+                                                    >
+                                                        {isCreatingTeam ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                        ) : (
+                                                            <>
+                                                                <span className="uppercase">Criar</span>
+                                                                <Plus className="w-4 h-4" />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <div className="retro-card__data">
+                            {/* Left Column: Team Details */}
+                            <div className="retro-card__right">
+                                <div className="retro-item retro-header">
+                                    IDENTIFICAÇÃO DA EQUIPA
+                                </div>
+                                {equipas.map((e) => (
+                                    <div key={e.id} className="retro-item">
+                                        <div className="flex items-center gap-4 w-full">
+                                            <div className="w-12 h-12 rounded-lg bg-amber-100 border-2 border-amber-200 flex items-center justify-center text-amber-700 font-black text-xl shrink-0">
+                                                {e.nome.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-gray-900 text-lg">{e.nome}</p>
+                                                <p className="text-xs text-gray-400 font-mono">ID: {e.id}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Right Column: Actions */}
+                            <div className="retro-card__left">
+                                <div className="retro-item retro-header justify-end">
+                                    OPERAÇÕES
+                                </div>
+                                {equipas.map((e) => (
+                                    <div key={e.id} className="retro-item justify-end gap-2">
+                                        <div className="flex items-center bg-gray-100 rounded-md border border-gray-200">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleOpenEditTeam(e)}
+                                                className="h-9 w-9 text-gray-400 hover:text-indigo-600 hover:bg-white rounded-none border-r border-gray-200"
+                                                title="Editar Equipa"
+                                            >
+                                                <div className="w-4 h-4">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                                </div>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDeleteTeam(e.id)}
+                                                className="h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-white rounded-none"
+                                                title="Remover Equipa"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Edit Team Dialog */}
+                    <Dialog open={isEditTeamOpen} onOpenChange={setIsEditTeamOpen}>
+                        <DialogContent className="sm:max-w-[425px] p-0 bg-transparent border-none shadow-none">
+                            <div className="retro-card mb-0 shadow-2xl">
+                                <div className="retro-card__title">
+                                    <span className="flex items-center gap-3">
+                                        <Trophy className="w-5 h-5 text-amber-500" />
+                                        EDITAR EQUIPA
+                                    </span>
+                                </div>
+                                <div className="bg-white border-x border-b border-gray-300 p-6 flex flex-col gap-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Nome da Equipa</Label>
+                                        <Input
+                                            value={editTeamData.nome}
+                                            onChange={(e) => setEditTeamData({ ...editTeamData, nome: e.target.value })}
+                                            className="font-mono border-2 border-gray-200 focus:border-amber-500 rounded-none bg-gray-50 h-12"
+                                            placeholder="Ex: FC Porto"
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-2">
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => setIsEditTeamOpen(false)}
+                                            className="font-mono font-bold text-gray-500 hover:text-gray-900"
+                                        >
+                                            CANCELAR
+                                        </Button>
+                                        <Button
+                                            onClick={handleUpdateTeam}
+                                            className="bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold rounded-sm shadow-md uppercase tracking-wider"
+                                        >
+                                            GUARDAR
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </TabsContent>
 
                 {/* Content Management */}
                 <TabsContent value="content" className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Jogadas */}
-                        <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden p-2">
-                            <CardHeader className="p-8 border-b border-gray-50 flex flex-row items-center justify-between">
-                                <CardTitle className="text-2xl font-black flex items-center gap-3">
-                                    <Activity className="w-8 h-8 text-emerald-500" />
-                                    Jogadas
-                                </CardTitle>
-                                <span className="bg-emerald-50 text-emerald-600 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                    {jogadas.length} total
+                    <div className="grid grid-cols-1 gap-8">
+                        {/* Jogadas - Retro Format */}
+                        <div className="retro-card shadow-2xl">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-3">
+                                    <Activity className="w-5 h-5 text-emerald-500" />
+                                    JOGADAS
                                 </span>
-                            </CardHeader>
-                            <CardContent className="p-0 max-h-[600px] overflow-y-auto">
-                                <div className="divide-y divide-gray-50">
+                                <span className="text-xs font-mono opacity-50">{jogadas.length} RECORDS</span>
+                            </div>
+                            <div className="retro-card__data">
+                                {/* Left Column: Play Details */}
+                                <div className="retro-card__right">
+                                    <div className="retro-item retro-header">
+                                        CONTEÚDO / AUTOR
+                                    </div>
                                     {jogadas.map(j => (
-                                        <div key={j.id} className="p-8 flex items-center justify-between hover:bg-gray-50 transition-all duration-300">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-100">
-                                                    <FileText className="w-7 h-7" />
+                                        <div key={j.id} className="retro-item">
+                                            <div className="flex items-center gap-4 w-full">
+                                                <div className="w-12 h-12 rounded-lg bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
+                                                    <FileText className="w-6 h-6" />
                                                 </div>
-                                                <div>
-                                                    <p className="font-black text-gray-900 text-lg leading-tight mb-1">{j.titulo}</p>
-                                                    <p className="text-xs text-gray-400 font-black uppercase tracking-widest leading-none">
-                                                        {j.autorNome} • <span className="text-emerald-500">{j.equipa}</span>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-bold text-gray-900 text-sm truncate leading-tight mb-1">{j.titulo}</p>
+                                                    <p className="text-xs text-gray-500 font-mono truncate uppercase tracking-tight">
+                                                        {j.autorNome} <span className="text-gray-300 mx-1">•</span> <span className="text-emerald-600 font-bold">{j.equipa}</span>
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDeleteContent('jogada', j.id)}
-                                                className="h-12 w-12 text-gray-300 hover:text-red-500 rounded-2xl"
-                                            >
-                                                <Trash2 className="w-6 h-6" />
-                                            </Button>
                                         </div>
                                     ))}
                                 </div>
-                            </CardContent>
-                        </Card>
 
-                        {/* Dicas */}
-                        <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden p-2">
-                            <CardHeader className="p-8 border-b border-gray-50 flex flex-row items-center justify-between">
-                                <CardTitle className="text-2xl font-black flex items-center gap-3">
-                                    <MessageSquare className="w-8 h-8 text-amber-500" />
-                                    Dicas
-                                </CardTitle>
-                                <span className="bg-amber-50 text-amber-600 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                    {dicas.length} total
-                                </span>
-                            </CardHeader>
-                            <CardContent className="p-0 max-h-[600px] overflow-y-auto">
-                                <div className="divide-y divide-gray-50">
-                                    {dicas.map(d => (
-                                        <div key={d.id} className="p-8 flex items-center justify-between hover:bg-gray-50 transition-all duration-300">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500 shadow-sm border border-amber-100">
-                                                    <Zap className="w-7 h-7" />
-                                                </div>
-                                                <div className="max-w-[200px]">
-                                                    <p className="font-black text-gray-900 text-lg leading-tight mb-1 truncate">{d.titulo || d.texto}</p>
-                                                    <p className="text-xs text-gray-400 font-black uppercase tracking-widest leading-none">
-                                                        Categoria: <span className="text-amber-500">{d.categoria}</span>
-                                                    </p>
-                                                </div>
+                                {/* Right Column: Actions */}
+                                <div className="retro-card__left">
+                                    <div className="retro-item retro-header justify-end">
+                                        OPERAÇÕES
+                                    </div>
+                                    {jogadas.map(j => (
+                                        <div key={j.id} className="retro-item justify-end gap-2">
+                                            <div className="flex items-center bg-gray-100 rounded-md border border-gray-200">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleOpenEditPlay(j)}
+                                                    className="h-9 w-9 text-gray-400 hover:text-emerald-600 hover:bg-white rounded-none border-r border-gray-200"
+                                                    title="Editar Jogada"
+                                                >
+                                                    <div className="w-4 h-4">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                                    </div>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDeleteContent('jogada', j.id)}
+                                                    className="h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-white rounded-none"
+                                                    title="Remover Jogada"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDeleteContent('dica', d.id)}
-                                                className="h-12 w-12 text-gray-300 hover:text-red-500 rounded-2xl"
-                                            >
-                                                <Trash2 className="w-6 h-6" />
-                                            </Button>
                                         </div>
                                     ))}
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
+
+                        {/* Edit Play Dialog */}
+                        <Dialog open={isEditPlayOpen} onOpenChange={setIsEditPlayOpen}>
+                            <DialogContent className="sm:max-w-[500px] p-0 bg-transparent border-none shadow-none">
+                                <div className="retro-card mb-0 shadow-2xl">
+                                    <div className="retro-card__title">
+                                        <span className="flex items-center gap-3">
+                                            <Activity className="w-5 h-5 text-emerald-500" />
+                                            EDITAR JOGADA
+                                        </span>
+                                    </div>
+                                    <div className="bg-white border-x border-b border-gray-300 p-6 flex flex-col gap-5">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Título</Label>
+                                            <Input
+                                                value={editPlayData.titulo}
+                                                onChange={(e) => setEditPlayData({ ...editPlayData, titulo: e.target.value })}
+                                                className="font-mono border-2 border-gray-200 focus:border-emerald-500 rounded-none bg-gray-50 h-12"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Descrição</Label>
+                                            <textarea
+                                                value={editPlayData.descricao}
+                                                onChange={(e) => setEditPlayData({ ...editPlayData, descricao: e.target.value })}
+                                                className="font-mono border-2 border-gray-200 focus:border-emerald-500 rounded-none bg-gray-50 p-3 min-h-[100px] w-full resize-none"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-3 pt-2">
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => setIsEditPlayOpen(false)}
+                                                className="font-mono font-bold text-gray-500 hover:text-gray-900"
+                                            >
+                                                CANCELAR
+                                            </Button>
+                                            <Button
+                                                onClick={handleUpdatePlay}
+                                                className="bg-emerald-500 hover:bg-emerald-600 text-white font-mono font-bold rounded-sm shadow-md uppercase tracking-wider"
+                                            >
+                                                GUARDAR
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+
+                        {/* Dicas - Retro Format */}
+                        <div className="retro-card shadow-2xl">
+                            <div className="retro-card__title">
+                                <span className="flex items-center gap-3">
+                                    <MessageSquare className="w-5 h-5 text-amber-500" />
+                                    DICAS
+                                </span>
+                                <span className="text-xs font-mono opacity-50">{dicas.length} RECORDS</span>
+                            </div>
+                            <div className="retro-card__data">
+                                {/* Left Column: Tip Details */}
+                                <div className="retro-card__right">
+                                    <div className="retro-item retro-header">
+                                        CONTEÚDO / CATEGORIA
+                                    </div>
+                                    {dicas.map(d => (
+                                        <div key={d.id} className="retro-item">
+                                            <div className="flex items-center gap-4 w-full">
+                                                <div className="w-12 h-12 rounded-lg bg-amber-100 border-2 border-amber-200 flex items-center justify-center text-amber-600 shadow-sm shrink-0">
+                                                    <Zap className="w-6 h-6" />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-bold text-gray-900 text-sm truncate leading-tight mb-1">{d.titulo || d.texto || 'Sem Título'}</p>
+                                                    <span className="inline-block bg-amber-50 text-amber-600 text-[10px] px-2 py-0.5 rounded border border-amber-100 font-bold uppercase tracking-wider">
+                                                        {d.categoria}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Right Column: Actions */}
+                                <div className="retro-card__left">
+                                    <div className="retro-item retro-header justify-end">
+                                        OPERAÇÕES
+                                    </div>
+                                    {dicas.map(d => (
+                                        <div key={d.id} className="retro-item justify-end gap-2">
+                                            <div className="flex items-center bg-gray-100 rounded-md border border-gray-200">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleOpenEditTip(d)}
+                                                    className="h-9 w-9 text-gray-400 hover:text-amber-600 hover:bg-white rounded-none border-r border-gray-200"
+                                                    title="Editar Dica"
+                                                >
+                                                    <div className="w-4 h-4">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                                    </div>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDeleteContent('dica', d.id)}
+                                                    className="h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-white rounded-none"
+                                                    title="Remover Dica"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Edit Tip Dialog */}
+                        <Dialog open={isEditTipOpen} onOpenChange={setIsEditTipOpen}>
+                            <DialogContent className="sm:max-w-[500px] p-0 bg-transparent border-none shadow-none">
+                                <div className="retro-card mb-0 shadow-2xl">
+                                    <div className="retro-card__title">
+                                        <span className="flex items-center gap-3">
+                                            <MessageSquare className="w-5 h-5 text-amber-500" />
+                                            EDITAR DICA
+                                        </span>
+                                    </div>
+                                    <div className="bg-white border-x border-b border-gray-300 p-6 flex flex-col gap-5">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Título</Label>
+                                            <Input
+                                                value={editTipData.titulo}
+                                                onChange={(e) => setEditTipData({ ...editTipData, titulo: e.target.value })}
+                                                className="font-mono border-2 border-gray-200 focus:border-amber-500 rounded-none bg-gray-50 h-12"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Categoria</Label>
+                                            <Select value={editTipData.categoria} onValueChange={(val: string) => setEditTipData({ ...editTipData, categoria: val })}>
+                                                <SelectTrigger className="font-mono border-2 border-gray-200 focus:border-amber-500 rounded-none bg-gray-50 h-12">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent className="font-mono border-2 border-gray-200 rounded-none">
+                                                    <SelectItem value="drible">Drible</SelectItem>
+                                                    <SelectItem value="remate">Remate</SelectItem>
+                                                    <SelectItem value="passe">Passe</SelectItem>
+                                                    <SelectItem value="defesa">Defesa</SelectItem>
+                                                    <SelectItem value="táctica">Táctica</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Conteúdo</Label>
+                                            <textarea
+                                                value={editTipData.conteudo}
+                                                onChange={(e) => setEditTipData({ ...editTipData, conteudo: e.target.value })}
+                                                className="font-mono border-2 border-gray-200 focus:border-amber-500 rounded-none bg-gray-50 p-3 min-h-[120px] w-full resize-none"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-3 pt-2">
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => setIsEditTipOpen(false)}
+                                                className="font-mono font-bold text-gray-500 hover:text-gray-900"
+                                            >
+                                                CANCELAR
+                                            </Button>
+                                            <Button
+                                                onClick={handleUpdateTip}
+                                                className="bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold rounded-sm shadow-md uppercase tracking-wider"
+                                            >
+                                                GUARDAR
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </TabsContent>
             </Tabs>

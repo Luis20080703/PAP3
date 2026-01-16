@@ -264,6 +264,15 @@ export const playsAPI = {
           ? `${API_BASE_URL.replace('/api', '')}/storage/${play.ficheiro}`
           : play.video_url || play.ficheiro;
 
+        // ✅ NORMALIZAR CATEGORIAS
+        const rawCategory = play.categoria || this.determinarCategoria(play.descricao);
+        let normalizedCategory = rawCategory;
+
+        if (rawCategory === 'Jogada Ofensiva') normalizedCategory = 'Ataque posicional';
+        else if (rawCategory === 'Jogada Defensiva') normalizedCategory = 'Defesa';
+        else if (rawCategory === 'Bola Parada') normalizedCategory = 'Bola parada';
+        else if (rawCategory === 'Geral') normalizedCategory = 'Técnica individual';
+
         return {
           id: play.id.toString(),
           titulo: play.titulo || 'Sem título',
@@ -273,7 +282,7 @@ export const playsAPI = {
           autorNome: autor?.nome || 'Utilizador Desconhecido',
           autorTipo: mapUserType(autor?.tipo) || 'atleta',
           equipa: equipa?.nome || 'Equipa Desconhecida',
-          categoria: this.determinarCategoria(play.descricao),
+          categoria: normalizedCategory,
           criadoEm: new Date(play.created_at || play.updated_at),
           comentarios: comentariosDaJogada.map((comentario: any) => ({
             id: comentario.id.toString(),
@@ -297,16 +306,19 @@ export const playsAPI = {
   },
 
   determinarCategoria(descricao: string): string {
-    if (!descricao) return 'Geral';
+    if (!descricao) return 'Técnica individual';
 
     const desc = descricao.toLowerCase();
 
-    if (desc.includes('ataque') || desc.includes('ofensiv')) return 'Jogada Ofensiva';
-    if (desc.includes('defesa') || desc.includes('defensiv')) return 'Jogada Defensiva';
-    if (desc.includes('transiç') || desc.includes('contra-ataque')) return 'Transição';
-    if (desc.includes('bola parada') || desc.includes('livre')) return 'Bola Parada';
+    // ✅ MAPEAMENTO PARA OPÇÕES VÁLIDAS DO SELECT
+    if (desc.includes('contra-ataque') || desc.includes('transição rápida')) return 'Contra-ataque';
+    if (desc.includes('ataque') || desc.includes('posicional') || desc.includes('ofensiv')) return 'Ataque posicional';
+    if (desc.includes('defesa') || desc.includes('defensiv') || desc.includes('bloqueio')) return 'Defesa';
+    if (desc.includes('transiç') || desc.includes('recuperação')) return 'Transição';
+    if (desc.includes('bola parada') || desc.includes('livre') || desc.includes('7 metros')) return 'Bola parada';
+    if (desc.includes('técnica') || desc.includes('finta') || desc.includes('remate')) return 'Técnica individual';
 
-    return 'Geral';
+    return 'Técnica individual'; // Fallback padrão seguro
   },
 
   async getById(id: string): Promise<PlayDisplay | null> {
@@ -334,7 +346,7 @@ export const playsAPI = {
         autorNome: autor?.nome || 'Utilizador Desconhecido',
         autorTipo: mapUserType(autor?.tipo) || 'atleta',
         equipa: equipa?.nome || 'Equipa Desconhecida',
-        categoria: this.determinarCategoria(play.descricao),
+        categoria: play.categoria || this.determinarCategoria(play.descricao),
         criadoEm: new Date(play.created_at || play.updated_at),
         comentarios: []
       };
@@ -372,6 +384,7 @@ export const playsAPI = {
     formData.append('equipa_id', equipaId.toString());
     formData.append('titulo', playData.titulo);
     formData.append('descricao', playData.descricao);
+    formData.append('categoria', playData.categoria); // ✅ ENVIAR CATEGORIA
 
     if (videoFile) {
       formData.append('video', videoFile);
@@ -442,6 +455,77 @@ export const playsAPI = {
 
     } catch (error) {
       console.error('❌ [ADD COMMENT] Erro ao criar comentário:', error);
+      throw error;
+    }
+  },
+
+  async update(playId: string, playData: Partial<PlayDisplay>, videoFile?: File): Promise<PlayDisplay> {
+    console.log('🔄 [UPDATE PLAY] A atualizar jogada:', playId);
+
+    const currentUser = authAPI.getCurrentUser();
+    if (!currentUser) {
+      throw new Error('Utilizador não autenticado');
+    }
+
+    const formData = new FormData();
+    formData.append('_method', 'PUT'); // Importante para Laravel aceitar multipart em PUT via POST
+
+    if (playData.titulo) formData.append('titulo', playData.titulo);
+    if (playData.descricao) formData.append('descricao', playData.descricao);
+    if (playData.categoria) formData.append('categoria', playData.categoria); // ✅ ENVIAR CATEGORIA
+
+    // Tentar manter a equipa original se não for passada
+    if (playData.equipa) {
+      // Aqui teríamos de buscar o ID da equipa novamente se for string
+      // Por simplificação, assumimos que quem edita não muda a equipa por enquanto 
+      // ou a API backend trata disso
+    }
+
+    if (videoFile) {
+      formData.append('video', videoFile);
+      console.log('📹 [UPDATE PLAY] Novo vídeo anexado:', videoFile.name);
+    } else if (playData.urlVideo) {
+      formData.append('ficheiro', playData.urlVideo);
+    }
+
+    console.log('📤 [UPDATE PLAY] Enviando dados...');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/jogadas/${playId}`, {
+        method: 'POST', // Usar POST com _method=PUT para suportar ficheiros
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+        },
+        body: formData,
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na atualização: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ [UPDATE PLAY] Jogada atualizada:', result.data);
+
+      return {
+        ...playData,
+        id: playId,
+        // Manter dados antigos se não vierem no update (simplificação)
+        titulo: playData.titulo || '',
+        descricao: playData.descricao || '',
+        urlVideo: result.data.ficheiro || playData.urlVideo,
+        autorId: result.data.user_id?.toString() || currentUser.id,
+        autorNome: currentUser.nome,
+        autorTipo: currentUser.tipo as any,
+        equipa: currentUser.equipa || '',
+        categoria: playData.categoria || this.determinarCategoria(playData.descricao || ''),
+        criadoEm: new Date(),
+        comentarios: [] // Não precisamos dos comentários para o retorno do update
+      } as PlayDisplay;
+
+    } catch (error: any) {
+      console.error('❌ [UPDATE PLAY] Erro ao atualizar jogada:', error);
       throw error;
     }
   },
@@ -547,6 +631,47 @@ export const tipsAPI = {
       criadoEm: new Date()
     };
   },
+  async update(tipId: string, tipData: Partial<TipDisplay>): Promise<TipDisplay> {
+    console.log('🔄 [UPDATE TIP] A atualizar dica:', tipId);
+
+    const currentUser = authAPI.getCurrentUser();
+    if (!currentUser) {
+      throw new Error('Utilizador não autenticado');
+    }
+
+    try {
+      const response = await apiCall(`/dicas/${tipId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          titulo: tipData.titulo,
+          descricao: tipData.descricao,
+          categoria: tipData.categoria,
+          conteudo: tipData.conteudo
+        }),
+      });
+
+      console.log('✅ [UPDATE TIP] Dica atualizada:', response.data);
+
+      return {
+        ...tipData,
+        id: tipId,
+        titulo: response.data.titulo,
+        descricao: response.data.descricao,  // Assuming backend returns this
+        categoria: response.data.categoria,
+        conteudo: response.data.conteudo,
+        autorId: response.data.user_id.toString(),
+        autorNome: currentUser.nome,
+        autorTipo: currentUser.tipo as any,
+        equipa: currentUser.equipa || '',
+        criadoEm: new Date(response.data.updated_at || response.data.created_at)
+      } as TipDisplay;
+
+    } catch (error: any) {
+      console.error('❌ [UPDATE TIP] Erro ao atualizar dica:', error);
+      throw error;
+    }
+  },
+
   async delete(tipId: string | number): Promise<void> {
     console.log('🗑️ [DELETE TIP] A apagar dica:', tipId);
 
@@ -769,6 +894,12 @@ export const equipasAPI = {
   async create(data: { nome: string; escalao_equipa_escalao?: string }): Promise<any> {
     return apiCall('/equipas', {
       method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async update(id: number | string, data: { nome: string }): Promise<any> {
+    return apiCall(`/equipas/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(data),
     });
   },

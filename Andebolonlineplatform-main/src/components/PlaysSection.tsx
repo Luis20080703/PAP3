@@ -7,7 +7,7 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
-import { Plus, MessageCircle, Trash2, Video, Search, ExternalLink, Loader2 } from 'lucide-react';
+import { Plus, MessageCircle, Trash2, Video, Search, ExternalLink, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApp } from '../context/AppContext';
 import { playsAPI } from '../services/api';
@@ -29,6 +29,16 @@ export function PlaysSection() {
   const [newPlayVideoUrl, setNewPlayVideoUrl] = useState('');
   const [videoOption, setVideoOption] = useState<'url' | 'upload'>('url');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Edit states
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingPlayId, setEditingPlayId] = useState<string | null>(null);
+  const [editPlayTitle, setEditPlayTitle] = useState('');
+  const [editPlayDescription, setEditPlayDescription] = useState('');
+  const [editPlayCategory, setEditPlayCategory] = useState('');
+  const [editPlayVideoUrl, setEditPlayVideoUrl] = useState('');
+  const [editVideoOption, setEditVideoOption] = useState<'url' | 'upload'>('url');
+  const [editSelectedFile, setEditSelectedFile] = useState<File | null>(null);
 
   const convertUserType = (tipo: string): 'atleta' | 'treinador' => {
     return tipo === 'treinador' ? 'treinador' : 'atleta';
@@ -138,6 +148,48 @@ export function PlaysSection() {
       } else {
         toast.error('Erro ao apagar jogada');
       }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditClick = (play: PlayDisplay) => {
+    setEditingPlayId(play.id);
+    setEditPlayTitle(play.titulo);
+    setEditPlayDescription(play.descricao);
+    setEditPlayCategory(play.categoria);
+    setEditPlayVideoUrl(play.urlVideo || '');
+    setEditVideoOption(play.urlVideo?.startsWith('http') ? 'url' : 'upload'); // Simple heuristic
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdatePlay = async () => {
+    if (!editingPlayId || !editPlayTitle || !editPlayDescription || !editPlayCategory) {
+      toast.error('Por favor, preencha todos os campos obrigatórios');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      let videoUrl = editPlayVideoUrl;
+
+      // Se o utilizador escolheu URL mas não mudou, mantém o original (que já está no state)
+
+      await playsAPI.update(editingPlayId, {
+        titulo: editPlayTitle,
+        descricao: editPlayDescription,
+        categoria: editPlayCategory,
+        urlVideo: videoUrl
+      }, editSelectedFile || undefined);
+
+      await atualizarJogadas();
+      setIsEditDialogOpen(false);
+      setEditingPlayId(null);
+      setEditSelectedFile(null);
+      toast.success('Jogada atualizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar jogada:', error);
+      toast.error('Erro ao atualizar jogada');
     } finally {
       setIsSubmitting(false);
     }
@@ -301,7 +353,7 @@ export function PlaysSection() {
           <div className="twitter-search-icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <g>
-                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-3.365-7.5-7.5z"></path>
+                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-3.365-7.5-7.5-7.5z"></path>
               </g>
             </svg>
           </div>
@@ -335,15 +387,26 @@ export function PlaysSection() {
                       </p>
                     </div>
                     {canModifyPlay(play) && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeletePlay(play.id)}
-                        disabled={isSubmitting}
-                        className="text-white hover:bg-white/20 h-8 w-8 p-0"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditClick(play)}
+                          disabled={isSubmitting}
+                          className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeletePlay(play.id)}
+                          disabled={isSubmitting}
+                          className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     )}
                   </div>
 
@@ -478,6 +541,117 @@ export function PlaysSection() {
           </Button>
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="jogada-btn">
+          <DialogHeader>
+            <DialogTitle>Editar Jogada</DialogTitle>
+            <DialogDescription>
+              Atualize as informações da sua jogada
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-play-title">Título *</Label>
+              <Input
+                id="edit-play-title"
+                placeholder="Ex: Contra-ataque rápido..."
+                value={editPlayTitle}
+                onChange={(e) => setEditPlayTitle(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-play-description">Descrição *</Label>
+              <Textarea
+                id="edit-play-description"
+                placeholder="Descreva a jogada..."
+                value={editPlayDescription}
+                onChange={(e) => setEditPlayDescription(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-play-category">Categoria *</Label>
+              <Select value={editPlayCategory} onValueChange={setEditPlayCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Contra-ataque">Contra-ataque</SelectItem>
+                  <SelectItem value="Ataque posicional">Ataque posicional</SelectItem>
+                  <SelectItem value="Técnica individual">Técnica individual</SelectItem>
+                  <SelectItem value="Defesa">Defesa</SelectItem>
+                  <SelectItem value="Transição">Transição</SelectItem>
+                  <SelectItem value="Bola parada">Bola parada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Vídeo (opcional)</Label>
+              <div className="flex gap-2 mb-3">
+                <Button
+                  type="button"
+                  variant={editVideoOption === 'url' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setEditVideoOption('url')}
+                >
+                  URL
+                </Button>
+                <Button
+                  type="button"
+                  variant={editVideoOption === 'upload' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setEditVideoOption('upload')}
+                >
+                  Upload
+                </Button>
+              </div>
+              {editVideoOption === 'url' ? (
+                <Input
+                  id="edit-play-video"
+                  type="url"
+                  placeholder="https://..."
+                  value={editPlayVideoUrl}
+                  onChange={(e) => setEditPlayVideoUrl(e.target.value)}
+                />
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    id="edit-play-file"
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setEditSelectedFile(file);
+                    }}
+                  />
+                  {editSelectedFile && (
+                    <p className="text-sm text-gray-600">
+                      Ficheiro selecionado: {editSelectedFile.name}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSubmitting}>
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdatePlay} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  A guardar...
+                </>
+              ) : (
+                'Guardar Alterações'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
