@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Tabs, TabsContent } from './ui/tabs';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApp } from '../context/AppContext';
@@ -26,7 +26,7 @@ interface RegisterData {
 
 export function Login({ onBack }: LoginProps) {
   // agora pedimos logout e user também do contexto
-  const { login, register, logout, user } = useApp();
+  const { login, register } = useApp();
 
   const [isLoading, setIsLoading] = useState(false);
   const [equipas, setEquipas] = useState<any[]>([]);
@@ -75,20 +75,9 @@ export function Login({ onBack }: LoginProps) {
 
     setIsLoading(true);
     try {
-      // Login retorna o usuário logado
-      const loggedUser = await login(loginEmail, loginPassword);
+      await login(loginEmail, loginPassword);
 
-      // Verificar se é treinador ou atleta não validado
-      if (loggedUser && (loggedUser.tipo === 'treinador' || loggedUser.tipo === 'atleta') && !loggedUser.validado) {
-        // Fazer logout
-        await logout();
-        const msg = loggedUser.tipo === 'atleta'
-          ? 'Conta de atleta aguarda aprovação do treinador.'
-          : 'Conta de treinador ainda não validada pelo administrador.';
-        toast.error(msg);
-        return;
-      }
-
+      // (a navegação para a dashboard ou página de aprovação é feita por quem controla a rota/estado global)
       toast.success('Login efetuado com sucesso!');
       // (a navegação para a dashboard é feita por quem controla a rota/estado global)
     } catch (error) {
@@ -146,10 +135,6 @@ export function Login({ onBack }: LoginProps) {
       // Depois do register, o AppContext pode ter feito setUser automaticamente.
       // Garantimos comportamento desejado:
       if (userType === 'treinador' || userType === 'atleta') {
-        // Se o registo criou um user e fez login automaticamente, forçamos logout
-        // para ficar no estado "aguardar validação".
-        await logout();
-
         const msg = userType === 'atleta'
           ? 'Registo efetuado! Aguarde aprovação do treinador da sua equipa.'
           : 'Registo efetuado! Aguarde validação do administrador.';

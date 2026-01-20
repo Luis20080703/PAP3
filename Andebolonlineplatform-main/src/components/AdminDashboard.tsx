@@ -284,11 +284,11 @@ export function AdminDashboard() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
                     <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 flex items-center gap-3">
-                        <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-600 animate-pulse" />
+                        <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600 animate-pulse" />
                         Master Panel
                     </h2>
                     <div className="text-sm sm:text-base text-gray-500 font-medium tracking-wide flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" />
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" />
                         Controlo Total do Sistema NexusHand
                     </div>
                 </div>
@@ -298,7 +298,7 @@ export function AdminDashboard() {
                         onClick={loadData}
                         disabled={loading}
                         variant="outline"
-                        className="bg-white text-indigo-600 border-2 border-indigo-100 hover:bg-indigo-50 shadow-sm transition-all py-5 sm:py-6 px-6 sm:px-8 rounded-2xl gap-3 font-bold w-full sm:w-auto mt-2 sm:mt-0"
+                        className="bg-white text-blue-600 border-2 border-blue-100 hover:bg-blue-50 shadow-sm transition-all py-5 sm:py-6 px-6 sm:px-8 rounded-2xl gap-3 font-bold w-full sm:w-auto mt-2 sm:mt-0"
                     >
                         <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
                         Sincronizar
@@ -335,13 +335,13 @@ export function AdminDashboard() {
                         <div className="retro-card shadow-2xl mb-0">
                             <div className="retro-card__title">
                                 <span className="flex items-center gap-2">
-                                    <Users className="w-4 h-4 text-indigo-500" />
+                                    <Users className="w-4 h-4 text-blue-500" />
                                     UTILIZADORES
                                 </span>
                             </div>
                             <div className="bg-white border-x border-b border-gray-300 p-6">
                                 <div className="flex items-center justify-between">
-                                    <div className="w-14 h-14 rounded-lg bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm">
+                                    <div className="w-14 h-14 rounded-lg bg-blue-100 border-2 border-blue-200 flex items-center justify-center text-blue-600 shadow-sm">
                                         <Users className="w-7 h-7" />
                                     </div>
                                     <div className="text-4xl font-black text-gray-900 font-mono">{stats?.users ?? '--'}</div>
@@ -418,7 +418,7 @@ export function AdminDashboard() {
                                     ESTADO DA PLATAFORMA
                                 </span>
                             </div>
-                            <div className="bg-gradient-to-br from-indigo-600 to-indigo-900 border-x border-b border-indigo-300 p-6">
+                            <div className="bg-gradient-to-br from-blue-600 to-blue-900 border-x border-b border-blue-300 p-6">
                                 <p className="text-white text-xs mb-4 font-mono leading-relaxed">
                                     Sistema operacional a 100%. Todos os serviços de análise e estatística estão ativos.
                                 </p>
@@ -439,7 +439,7 @@ export function AdminDashboard() {
                         <div className="retro-card shadow-2xl mb-0">
                             <div className="retro-card__title">
                                 <span className="flex items-center gap-2">
-                                    <Shield className="w-4 h-4 text-indigo-500" />
+                                    <Shield className="w-4 h-4 text-blue-500" />
                                     AÇÕES RECOMENDADAS
                                 </span>
                             </div>
@@ -574,7 +574,7 @@ export function AdminDashboard() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleOpenEditUser(u)}
-                                                className="h-8 w-8 text-gray-500 hover:text-indigo-600 hover:bg-white rounded-none border-r border-gray-200"
+                                                className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-white rounded-none border-r border-gray-200"
                                             >
                                                 <User className="w-4 h-4" />
                                             </Button>
@@ -599,7 +599,7 @@ export function AdminDashboard() {
                             <div className="retro-card mb-0 shadow-2xl">
                                 <div className="retro-card__title">
                                     <span className="flex items-center gap-3">
-                                        <User className="w-5 h-5 text-indigo-500" />
+                                        <User className="w-5 h-5 text-blue-500" />
                                         EDITAR UTILIZADOR
                                     </span>
                                 </div>
@@ -609,13 +609,13 @@ export function AdminDashboard() {
                                         <Input
                                             value={editUserData.nome}
                                             onChange={(e) => setEditUserData({ ...editUserData, nome: e.target.value })}
-                                            className="font-mono border-2 border-gray-200 focus:border-indigo-500 rounded-none bg-gray-50 h-12"
+                                            className="font-mono border-2 border-gray-200 focus:border-blue-500 rounded-none bg-gray-50 h-12"
                                         />
                                     </div>
                                     <div className="space-y-1">
                                         <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Cargo</Label>
                                         <Select value={editUserData.tipo} onValueChange={(val: string) => setEditUserData({ ...editUserData, tipo: val })}>
-                                            <SelectTrigger className="font-mono border-2 border-gray-200 focus:border-indigo-500 rounded-none bg-gray-50 h-12">
+                                            <SelectTrigger className="font-mono border-2 border-gray-200 focus:border-blue-500 rounded-none bg-gray-50 h-12">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent className="font-mono border-2 border-gray-200 rounded-none">
@@ -630,7 +630,7 @@ export function AdminDashboard() {
                                         <Input
                                             value={editUserData.equipa}
                                             onChange={(e) => setEditUserData({ ...editUserData, equipa: e.target.value })}
-                                            className="font-mono border-2 border-gray-200 focus:border-indigo-500 rounded-none bg-gray-50 h-12"
+                                            className="font-mono border-2 border-gray-200 focus:border-blue-500 rounded-none bg-gray-50 h-12"
                                             placeholder="Nome da equipa"
                                         />
                                     </div>
@@ -638,7 +638,7 @@ export function AdminDashboard() {
                                     <div className="flex justify-end gap-3 pt-4">
                                         <Button
                                             onClick={handleUpdateUser}
-                                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-mono font-bold w-full h-12 rounded-sm shadow-md uppercase tracking-wider"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-mono font-bold w-full h-12 rounded-sm shadow-md uppercase tracking-wider"
                                         >
                                             Guardar Alterações
                                         </Button>
@@ -749,7 +749,7 @@ export function AdminDashboard() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleOpenEditTeam(e)}
-                                                className="h-9 w-9 text-gray-400 hover:text-indigo-600 hover:bg-white rounded-none border-r border-gray-200"
+                                                className="h-9 w-9 text-gray-400 hover:text-blue-600 hover:bg-white rounded-none border-r border-gray-200"
                                                 title="Editar Equipa"
                                             >
                                                 <div className="w-4 h-4">

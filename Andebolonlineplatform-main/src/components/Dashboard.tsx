@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from './ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { BookOpen, TrendingUp, Users, LogOut, Upload } from 'lucide-react';
+import { Tabs, TabsContent } from './ui/tabs';
+import { BookOpen, TrendingUp, Users } from 'lucide-react';
 import { PlaysSection } from './PlaysSection';
 import { TipsSection } from './TipsSection';
 import { TeamStatsSection } from './TeamStatsSection';
@@ -12,7 +12,7 @@ import { AdminDashboard } from './AdminDashboard';
 import { AdminSidebar } from './AdminSidebar';
 import { useApp } from '../context/AppContext';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from './ui/sidebar';
-import { authAPI, API_BASE_URL } from '../services/api';
+
 import { DockMenu } from './DockMenu';
 
 interface DashboardProps {
@@ -21,25 +21,10 @@ interface DashboardProps {
 }
 
 export function Dashboard({ onLogout, onNavigateToPremium }: DashboardProps) {
-  const { user, setUser } = useApp();
+  const { user } = useApp();
   const [activeTab, setActiveTab] = useState('plays');
 
-  // ✅ ATUALIZAR DADOS DO UTILIZADOR AO ENTRAR (FIX PARA EQUIPA)
-  useEffect(() => {
-    const fetchFreshUser = async () => {
-      try {
-        const result = await authAPI.getProfile();
-        if (result.success && result.user) {
-          setUser(result.user);
-          localStorage.setItem('current_user', JSON.stringify(result.user));
-        }
-      } catch (e) {
-        console.error("Erro ao atualizar perfil", e);
-      }
-    };
-    fetchFreshUser();
-  }, [setUser]);
-
+  // Dashboard only renders if user exists
   if (!user) return null;
 
   const isAdmin = user && (user.tipo === 'root' || user.tipo === 'admin');

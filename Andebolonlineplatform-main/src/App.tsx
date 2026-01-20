@@ -5,13 +5,13 @@ import { Dashboard } from './components/Dashboard';
 import { Toaster } from './components/ui/sonner';
 import { AppProvider, useApp } from './context/AppContext';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
-import { BubbleCursor } from './components/BubbleCursor';
 import { ServerConfig } from './components/ServerConfig';
 
 import { PremiumPage } from './components/PremiumPage';
+import { PendingApproval } from './components/PendingApproval';
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard' | 'premium'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard' | 'premium' | 'pending'>('home');
   const { user, carregando, logout: apiLogout } = useApp();
 
   // Set document title
@@ -19,12 +19,26 @@ function AppContent() {
     document.title = 'NexusHand - Plataforma de Andebol';
   }, []);
 
-  // Check if user is logged in on mount
+  // Check if user is logged in and handle routing based on validation status
   useEffect(() => {
-    if (user && currentPage !== 'premium') { // Evita overwrite se já estiver em premium (navegação interna)
-      setCurrentPage('dashboard');
+    if (user) {
+      if (!user.validado) {
+        if (currentPage !== 'pending') {
+          setCurrentPage('pending');
+        }
+      } else {
+        // Redireciona se estiver na home, login ou na página de pendente (mas já validado)
+        if (currentPage === 'home' || currentPage === 'login' || currentPage === 'pending') {
+          setCurrentPage('dashboard');
+        }
+      }
+    } else {
+      // Se não há user e não estamos na home ou login, volta para home
+      if (currentPage !== 'home' && currentPage !== 'login') {
+        setCurrentPage('home');
+      }
     }
-  }, [user]);
+  }, [user, user?.validado, currentPage]);
 
   const handleLogout = async () => {
     await apiLogout();
@@ -51,7 +65,14 @@ function AppContent() {
       {currentPage === 'login' && !user && (
         <Login onBack={() => setCurrentPage('home')} />
       )}
-      {currentPage === 'dashboard' && user && (
+      {currentPage === 'pending' && user && !user.validado && (
+        <PendingApproval
+          userName={user.nome}
+          userEmail={user.email}
+          onLogout={handleLogout}
+        />
+      )}
+      {currentPage === 'dashboard' && user && user.validado && (
         <Dashboard
           onLogout={handleLogout}
           onNavigateToPremium={() => setCurrentPage('premium')}

@@ -100,7 +100,7 @@ export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarP
             <SidebarFooter className="p-4 border-t border-gray-50 space-y-4">
                 {/* User Card */}
                 <div className="bg-gray-50/50 p-4 rounded-3xl border border-gray-100 flex items-center gap-3 overflow-hidden">
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-black flex-shrink-0">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 font-black flex-shrink-0">
                         {user?.nome?.charAt(0).toUpperCase()}
                     </div>
                     {isExpanded && (
