@@ -321,6 +321,9 @@ export function TipsSection() {
                             </span>
                           </div>
                           <DialogTitle className="text-2xl">{tip.titulo}</DialogTitle>
+                          <DialogDescription className="text-gray-500">
+                            Detalhes técnicos e instruções para {tip.titulo}
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-6 py-4">
                           <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">

@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Treinador;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccountApproved;
 
 /**
  * Controller para funcionalidades administrativas (API).
@@ -123,6 +125,9 @@ class AdminController extends Controller
     /**
      * Elimina um utilizador e dependências.
      */
+    /**
+     * Elimina um utilizador e dependências.
+     */
     public function deleteUser($id)
     {
         $this->authorizeAdmin();
@@ -132,8 +137,29 @@ class AdminController extends Controller
             return response()->json(['success' => false, 'message' => 'Não podes apagar a tua própria conta'], 400);
         }
 
-        $user->delete();
-        return response()->json(['success' => true, 'message' => 'Utilizador removido com sucesso']);
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
+                // 1. Apagar conteúdos criados pelo user
+                $user->jogadas()->delete();
+                $user->dicas()->delete();
+                $user->comentarios()->delete();
+
+                // 2. Apagar perfis associados
+                // Nota: Se 'atletas' tiver foreign keys noutras tabelas (ex: estatisticas), 
+                // pode ser necessário limpar isso também aqui se o cascade não estiver na DB.
+                $user->atletas()->delete(); 
+                $user->treinadores()->delete();
+
+                // 3. Finalmente apagar o user
+                $user->delete();
+            });
+
+            return response()->json(['success' => true, 'message' => 'Utilizador e dados associados removidos com sucesso']);
+
+        } catch (\Exception $e) {
+            Log::error('Erro ao apagar utilizador: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Erro ao apagar utilizador: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -225,6 +251,12 @@ class AdminController extends Controller
             if ($treinador->user) {
                 $treinador->user->validado = true;
                 $treinador->user->save();
+
+                try {
+                    Mail::to($treinador->user->email)->send(new AccountApproved($treinador->user));
+                } catch (\Exception $e) {
+                    Log::error('Erro ao enviar email de aprovação: ' . $e->getMessage());
+                }
             }
 
             Log::info('Treinador validado pelo admin', ['treinador_id' => $treinador->id, 'admin_id' => Auth::id(), 'user_validado' => $treinador->user->validado ?? null]);
@@ -271,6 +303,13 @@ class AdminController extends Controller
 
         $user->validado = true;
         $user->save();
+
+        try {
+            Mail::to($user->email)->send(new AccountApproved($user));
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar email de aprovação: ' . $e->getMessage());
+        }
+        
         
         // Se for treinador, também validamos o registo na tabela 'treinadores'
         if ($user->tipo === 'treinador') {

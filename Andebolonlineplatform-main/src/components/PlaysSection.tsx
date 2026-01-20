@@ -17,7 +17,7 @@ import { LoadingWave } from './ui/LoadingWave';
 export function PlaysSection() {
   const { user, jogadas, jogadasCarregando, atualizarJogadas } = useApp();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [selectedPlay, setSelectedPlay] = useState<string>('');
+
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -140,7 +140,7 @@ export function PlaysSection() {
     try {
       await playsAPI.delete(playId);
       await atualizarJogadas();
-      setSelectedPlay('');
+
       toast.success('Jogada apagada com sucesso!');
     } catch (error: any) {
       if (error.response?.status === 403) {
@@ -427,83 +427,78 @@ export function PlaysSection() {
                     <DialogTrigger asChild>
                       <button
                         className="btn-details w-full mt-2"
-                        onClick={() => setSelectedPlay(play.id)}
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Ver Detalhes ({play.comentarios.length})
                       </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                      {selectedPlay === play.id && (
-                        <>
-                          <DialogHeader>
-                            <DialogTitle>{play.titulo}</DialogTitle>
-                            <DialogDescription>
-                              por {play.autorNome} • {play.equipa} • {play.criadoEm.toLocaleDateString()}
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <VideoPlayer url={play.urlVideo} />
-                            <div>
-                              <h3 className="mb-2">Descrição</h3>
-                              <p className="text-gray-600">{play.descricao}</p>
-                            </div>
-                            <Separator />
-                            <div>
-                              <h3 className="mb-4">
-                                Comentários ({play.comentarios.length})
-                              </h3>
-                              <div className="space-y-4 mb-4">
-                                {play.comentarios.length === 0 ? (
-                                  <p className="text-gray-500 text-center py-4">
-                                    Ainda não há comentários. Seja o primeiro!
-                                  </p>
-                                ) : (
-                                  play.comentarios.map((comment: CommentDisplay) => (
-                                    <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                                      <div className="flex justify-between items-start mb-2">
-                                        <div>
-                                          <span>{comment.autorNome}</span>
-                                          <Badge variant="outline" className="ml-2">
-                                            {comment.autorTipo === 'atleta' ? 'Atleta' : 'Treinador'}
-                                          </Badge>
-                                        </div>
-                                        <span className="text-sm text-gray-500">
-                                          {comment.criadoEm.toLocaleDateString()}
-                                        </span>
-                                      </div>
-                                      <p className="text-gray-700">{comment.conteudo}</p>
+                      <DialogHeader>
+                        <DialogTitle>{play.titulo}</DialogTitle>
+                        <DialogDescription>
+                          por {play.autorNome} • {play.equipa} • {play.criadoEm.toLocaleDateString()}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <VideoPlayer url={play.urlVideo} />
+                        <div>
+                          <h3 className="mb-2">Descrição</h3>
+                          <p className="text-gray-600">{play.descricao}</p>
+                        </div>
+                        <Separator />
+                        <div>
+                          <h3 className="mb-4">
+                            Comentários ({play.comentarios.length})
+                          </h3>
+                          <div className="space-y-4 mb-4">
+                            {play.comentarios.length === 0 ? (
+                              <p className="text-gray-500 text-center py-4">
+                                Ainda não há comentários. Seja o primeiro!
+                              </p>
+                            ) : (
+                              play.comentarios.map((comment: CommentDisplay) => (
+                                <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                      <span>{comment.autorNome}</span>
+                                      <Badge variant="outline" className="ml-2">
+                                        {comment.autorTipo === 'atleta' ? 'Atleta' : 'Treinador'}
+                                      </Badge>
                                     </div>
-                                  ))
-                                )}
-                              </div>
-                              <div className="space-y-2">
-                                <Label>Adicionar Comentário</Label>
-                                <Textarea
-                                  placeholder="Escreva o seu comentário..."
-                                  value={newComment}
-                                  onChange={(e) => setNewComment(e.target.value)}
-                                  rows={3}
-                                />
-                                <Button
-                                  onClick={() => handleAddComment(play.id)}
-                                  className="w-full"
-                                  disabled={isSubmitting}
-                                >
-                                  {isSubmitting ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                      A publicar...
-                                    </>
-                                  ) : (
-                                    'Publicar Comentário'
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
+                                    <span className="text-sm text-gray-500">
+                                      {comment.criadoEm.toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <p className="text-gray-700">{comment.conteudo}</p>
+                                </div>
+                              ))
+                            )}
                           </div>
-                        </>
-                      )}
+                          <div className="space-y-2">
+                            <Label>Adicionar Comentário</Label>
+                            <Textarea
+                              placeholder="Escreva o seu comentário..."
+                              value={newComment}
+                              onChange={(e) => setNewComment(e.target.value)}
+                              rows={3}
+                            />
+                            <Button
+                              onClick={() => handleAddComment(play.id)}
+                              className="w-full"
+                              disabled={isSubmitting}
+                            >
+                              {isSubmitting ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  A publicar...
+                                </>
+                              ) : (
+                                'Publicar Comentário'
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     </DialogContent>
                   </Dialog>
                 </div>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Treinador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccountApproved;
 
 class TreinadorController extends Controller
 {
@@ -98,6 +100,14 @@ class TreinadorController extends Controller
         if ($treinador->user) {
             $treinador->user->validado = true;
             $treinador->user->save();
+
+            // Send approval email
+            try {
+                Mail::to($treinador->user->email)->send(new AccountApproved($treinador->user));
+            } catch (\Exception $e) {
+                // Log error but don't fail the request
+                \Illuminate\Support\Facades\Log::error('Erro ao enviar email de aprovação: ' . $e->getMessage());
+            }
         }
 
         return response()->json([
@@ -183,6 +193,13 @@ class TreinadorController extends Controller
         if ($atleta->user) {
             $atleta->user->validado = true;
             $atleta->user->save();
+
+            // Send approval email
+            try {
+                Mail::to($atleta->user->email)->send(new AccountApproved($atleta->user));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Erro ao enviar email de aprovação para atleta: ' . $e->getMessage());
+            }
         }
 
         return response()->json([

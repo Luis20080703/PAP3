@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import {
@@ -306,7 +306,7 @@ export function AdminDashboard() {
                 </div>
             </div>
 
-            <Tabs defaultValue="overview" onValueChange={setActiveTab} className="space-y-8">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
                 <div className="flex justify-start">
                     <TabsList className="admin-tab-container h-auto flex-wrap md:flex-nowrap">
                         {[
@@ -569,7 +569,7 @@ export function AdminDashboard() {
                                         )}
 
                                         {/* Edit/Delete */}
-                                        <div className="flex items-center bg-gray-100 rounded-md border border-gray-200">
+                                        <div className="flex items-center bg-gray-100 rounded-md border border-gray-200 relative z-10">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
@@ -596,6 +596,10 @@ export function AdminDashboard() {
                     {/* Edit User Dialog */}
                     <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
                         <DialogContent className="sm:max-w-[425px] p-0 bg-transparent border-none shadow-none">
+                            <DialogHeader className="sr-only">
+                                <DialogTitle>Editar Utilizador</DialogTitle>
+                                <DialogDescription>Formulário para editar as permissões e dados do utilizador.</DialogDescription>
+                            </DialogHeader>
                             <div className="retro-card mb-0 shadow-2xl">
                                 <div className="retro-card__title">
                                     <span className="flex items-center gap-3">
@@ -668,6 +672,10 @@ export function AdminDashboard() {
                                         </Button>
                                     </DialogTrigger>
                                     <DialogContent className="sm:max-w-[425px] p-0 bg-transparent border-none shadow-none">
+                                        <DialogHeader className="sr-only">
+                                            <DialogTitle>Criar Nova Equipa</DialogTitle>
+                                            <DialogDescription>Formulário para registar uma nova equipa na plataforma.</DialogDescription>
+                                        </DialogHeader>
                                         <div className="retro-card mb-0 shadow-2xl">
                                             <div className="retro-card__title">
                                                 <span className="flex items-center gap-3">
@@ -775,6 +783,10 @@ export function AdminDashboard() {
                     {/* Edit Team Dialog */}
                     <Dialog open={isEditTeamOpen} onOpenChange={setIsEditTeamOpen}>
                         <DialogContent className="sm:max-w-[425px] p-0 bg-transparent border-none shadow-none">
+                            <DialogHeader className="sr-only">
+                                <DialogTitle>Editar Equipa</DialogTitle>
+                                <DialogDescription>Formulário para alterar o nome da equipa.</DialogDescription>
+                            </DialogHeader>
                             <div className="retro-card mb-0 shadow-2xl">
                                 <div className="retro-card__title">
                                     <span className="flex items-center gap-3">
@@ -886,6 +898,10 @@ export function AdminDashboard() {
                         {/* Edit Play Dialog */}
                         <Dialog open={isEditPlayOpen} onOpenChange={setIsEditPlayOpen}>
                             <DialogContent className="sm:max-w-[500px] p-0 bg-transparent border-none shadow-none">
+                                <DialogHeader className="sr-only">
+                                    <DialogTitle>Editar Jogada</DialogTitle>
+                                    <DialogDescription>Formulário para editar o título e descrição da jogada.</DialogDescription>
+                                </DialogHeader>
                                 <div className="retro-card mb-0 shadow-2xl">
                                     <div className="retro-card__title">
                                         <span className="flex items-center gap-3">
@@ -1000,6 +1016,10 @@ export function AdminDashboard() {
                         {/* Edit Tip Dialog */}
                         <Dialog open={isEditTipOpen} onOpenChange={setIsEditTipOpen}>
                             <DialogContent className="sm:max-w-[500px] p-0 bg-transparent border-none shadow-none">
+                                <DialogHeader className="sr-only">
+                                    <DialogTitle>Editar Dica</DialogTitle>
+                                    <DialogDescription>Formulário para editar o conteúdo e categoria da dica.</DialogDescription>
+                                </DialogHeader>
                                 <div className="retro-card mb-0 shadow-2xl">
                                     <div className="retro-card__title">
                                         <span className="flex items-center gap-3">
