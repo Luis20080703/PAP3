@@ -5,7 +5,6 @@ use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use App\Exceptions\AtletaNotFoundException;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\MissingCredentialsException;
@@ -27,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
+            
         ]);
 
         // ✅ CORS CONFIGURADO

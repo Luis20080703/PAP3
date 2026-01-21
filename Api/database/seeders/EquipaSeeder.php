@@ -46,8 +46,11 @@ class EquipaSeeder extends Seeder
             ]
         ];
 
-        foreach ($equipas as $equipa) {
-            DB::table('equipas')->insertOrIgnore($equipa);
+        foreach ($equipas as $equipaData) {
+            \App\Models\Equipa::updateOrCreate(
+                ['nome' => $equipaData['nome']],
+                ['escalao_equipa_escalao' => $equipaData['escalao_equipa_escalao']]
+            );
         }
 
         $this->command->info('✅ ' . count($equipas) . ' equipas criadas com sucesso!');

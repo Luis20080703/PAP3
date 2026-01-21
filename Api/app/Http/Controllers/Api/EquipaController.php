@@ -27,7 +27,7 @@ class EquipaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nome' => 'required|string|max:255',
+            'nome' => 'required|string|max:255|unique:equipas,nome',
         ]);
 
         $equipa = Equipa::create($validated);
@@ -74,7 +74,7 @@ class EquipaController extends Controller
         }
 
         $validated = $request->validate([
-            'nome' => 'sometimes|string|max:255',
+            'nome' => 'sometimes|string|max:255|unique:equipas,nome,' . $id,
         ]);
 
         $equipa->update($validated);
