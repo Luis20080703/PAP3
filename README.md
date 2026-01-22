@@ -8,7 +8,7 @@ NexusHand é uma plataforma web full-stack para a gestão profissional de equipa
 
 <details> <summary><strong>🎯 Objetivos do Projeto</strong></summary>
 
-Digitalizar a gestão desportiva no andebol
+   -Digitalizar a gestão desportiva no andebol
 
 Facilitar a análise de desempenho individual e coletivo
 
