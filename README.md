@@ -137,6 +137,7 @@ Categorias:
 O módulo de dicas permite a partilha de dicas entre clubes.
 
 Categorias:
+
     📌 Fintas
     📌 Dribles
     📌 Remates
