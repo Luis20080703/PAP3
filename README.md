@@ -4,70 +4,76 @@
 
 📌 Visão Geral
 
-    NexusHand é uma plataforma web full-stack desenvolvida com o objetivo de modernizar e profissionalizar a gestão de equipas de andebol, integrando estatísticas, jogadas em vídeo e partilha de conhecimento técnico numa única solução digital.
+  NexusHand é uma plataforma web full-stack desenvolvida para modernizar a gestão de equipas de andebol.
+  Centraliza estatísticas, análise de jogadas em vídeo e gestão de equipas, oferecendo uma experiência profissional e intuitiva.
 
 <details> <summary><strong>🎯 Objetivos do Projeto</strong></summary> <br>
 
-    O projeto NexusHand tem como principais objetivos:
+  O projeto NexusHand foi desenvolvido com os seguintes objetivos principais:
 
-  Digitalizar a gestão desportiva no andebol
+<br>
 
-  Facilitar a análise de desempenho individual e coletivo
+  📌 Digitalizar a gestão desportiva no andebol
 
-  Promover a partilha de jogadas e conhecimento técnico
+  📌 Facilitar a análise de desempenho individual e coletivo
 
-  Garantir segurança, escalabilidade e boa experiência de utilização
+  📌 Promover a partilha de jogadas e conhecimento técnico
+
+  📌 Criar uma plataforma segura, moderna e escalável
 
 </details>
 <details> <summary><strong>🏗️ Arquitetura da Solução</strong></summary> <br>
-
-    A plataforma adota uma arquitetura moderna, separando claramente Frontend e Backend, comunicando através de uma API REST.
-
 🎨 Frontend
+<br>
 
-    Responsável pela interface e experiência do utilizador.
+  O frontend foi desenvolvido como uma Single Page Application (SPA):
 
-  React 18 + TypeScript
+  ⚛️ React 18 + TypeScript
 
-  Vite
+  ⚡ Vite
 
-  Tailwind CSS + Shadcn/ui
+  🎨 Tailwind CSS + Shadcn/ui
 
-  SPA (Single Page Application)
+  📱 Design responsivo (mobile-first)
 
-  Preparado para PWA
+  📦 Estrutura preparada para PWA
 
+<br>
 ⚙️ Backend
+<br>
 
-    Responsável pela lógica de negócio, segurança e persistência de dados.
+  O backend é baseado numa API RESTful robusta:
 
-  Laravel 12 (PHP 8.2+)
+  🐘 Laravel 12 (PHP 8.2+)
 
-  Base de dados SQLite
+  🗄️ SQLite
 
-  API RESTful
+  🔐 Autenticação com Laravel Sanctum
 
-  Autenticação com Laravel Sanctum
+  🛡️ Validação e segurança de dados
 
 </details>
 <details> <summary><strong>🔐 Sistema de Autenticação e Perfis</strong></summary> <br>
 
-    O sistema de autenticação é baseado em tokens seguros, garantindo controlo de acessos e isolamento de dados.
+  O sistema de autenticação foi implementado com Laravel Sanctum, garantindo segurança e controlo de acessos.
 
+<br>
 👤 Atletas
 
   Registo sujeito a aprovação
 
   Acesso limitado até validação
 
-  Visualização apenas das suas estatísticas
+  Visualizam apenas as suas estatísticas
 
+<br>
 🧑‍🏫 Treinadores
 
-  Aprovação obrigatória por Administrador
+  Aprovação por Administrador
 
-  Gestão exclusiva da sua equipa
+  Gestão de atletas da sua equipa
 
+<br>
 🛠️ Administradores
 
   Controlo total da plataforma
@@ -77,77 +83,57 @@
 </details>
 <details> <summary><strong>📊 Gestão de Estatísticas</strong></summary> <br>
 
-    A plataforma permite o registo e cálculo automático de estatísticas, fornecendo dados relevantes para análise de desempenho.
+  A plataforma permite uma análise detalhada do desempenho desportivo.
 
+<br>
 Estatísticas de Atleta
 
-  Golos marcados
+  ⚽ Golos marcados
 
-  Cartões amarelos e vermelhos
+  🟨 Cartões amarelos
 
-  Exclusões (2 minutos)
+  🟥 Cartões vermelhos
 
-  Jogos disputados
+  ⏱️ Exclusões de 2 minutos
 
-  Médias calculadas automaticamente
+  📈 Médias automáticas por jogo
 
+<br>
 Estatísticas de Equipa
 
-  Agregação das estatísticas dos atletas
+  📊 Agregação automática dos atletas
 
-  Rankings (Top 5 marcadores)
+  🏅 Rankings (Top 5 marcadores)
 
-  Análise disciplinar coletiva
+  🚨 Análise disciplinar da equipa
 
 </details>
 <details> <summary><strong>🎥 Sistema de Jogadas em Vídeo</strong></summary> <br>
 
-    O módulo de jogadas permite a análise tática através de vídeo.
+  O módulo de jogadas permite a partilha e análise tática de vídeos.
 
-  Upload de vídeos locais
+<br>
 
-  Integração com YouTube (incluindo Shorts)
+  🎬 Upload de vídeos locais
 
-  Classificação por categorias:
+  ▶️ Integração com YouTube (incluindo Shorts)
 
-  Ataque
+  📂 Categorias:
 
-  Defesa
+    • Ataque
 
-  Contra-ataque
+    • Defesa
 
-  Guarda-redes
+    • Contra-ataque
 
-  Sistema de comentários
+    • Guarda-redes
 
-  Autoria identificada
+  💬 Sistema de comentários
 
-</details>
-<details> <summary><strong>💡 Dicas Técnicas</strong></summary> <br>
-
-    Área dedicada à partilha de conhecimento técnico e educativo.
-
-  Artigos e dicas práticas
-
-  Conteúdos sobre técnica, tática e preparação física
-
-  Organização por categorias
+  ✍️ Autoria identificada
 
 </details>
-<details> <summary><strong>🧑‍💼 Administração e Gestão</strong></summary> <br>
-
-    Ferramentas administrativas avançadas para controlo total da plataforma.
-
-  Criação e gestão de equipas
-
-  Gestão de escalões
-
-  Validação de treinadores
-
-  Moderação de conteúdos
-
-</details>
-<details> <summary><strong>🚀 Execução Local do Projeto</strong></summary> <br>
+<details> <summary><strong>🚀 Execução Local</strong></summary> <br>
 Backend
 composer install
 cp .env.example .env
@@ -155,22 +141,18 @@ php artisan key:generate
 php artisan migrate --seed
 php artisan serve
 
+<br>
 Frontend
 npm install
 npm run dev
 
 </details>
-<details> <summary><strong>📚 Documentação da API</strong></summary> <br>
-Método	Endpoint	Descrição
-POST	/login	Autenticação
-POST	/register	Registo
-GET	/equipas	Equipas
-GET	/estatisticas-atletas	Estatísticas do atleta
-GET	/estatisticas-equipas	Estatísticas da equipa
-GET	/jogadas	Jogadas
-</details>
 <details> <summary><strong>🏁 Conclusão</strong></summary> <br>
 
-    O NexusHand apresenta-se como uma solução completa e moderna para a gestão de equipas de andebol, aliando tecnologia, análise desportiva e organização profissional.
+  O NexusHand apresenta-se como uma solução moderna e completa para a gestão de equipas de andebol, integrando tecnologia, análise desportiva e uma interface intuitiva.
+
+<br>
+
+  Este projeto foi desenvolvido no âmbito da PAP — Programação e Sistemas de Informação, demonstrando competências em Full-Stack Development, APIs REST e Design de Interfaces.
 
 </details>
