@@ -101,11 +101,11 @@ Estatísticas de Atleta
 <br>
 Estatísticas de Equipa
 
-  📊 Agregação automática dos atletas
+  📊 Agregação automática dos atletas;
 
-  🏅 Rankings (Top 5 marcadores)
+  🏅 Rankings (Top 5 marcadores);
 
-  🚨 Análise disciplinar da equipa
+  🚨 Análise disciplinar da equipa;
 
 </details>
 <details> <summary><strong>🎥 Sistema de Jogadas em Vídeo</strong></summary> <br>
@@ -117,7 +117,6 @@ O módulo de jogadas permite a partilha e análise tática de vídeos só na sua
 ▶️ Integração com YouTube (incluindo Shorts)
 
 📊 Categorias
-
   📌 Contra-ataque;
 
   📌 Ataque posicional;
