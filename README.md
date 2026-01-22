@@ -157,6 +157,7 @@ Categorias:
 
 Este sistema faz com que o utilizador tenha restrições consoante o seu tipo.
 
+
 Atletas:
 
 📌 Vizualizar os componentes(jogadas e dicas);
@@ -169,6 +170,7 @@ Atletas:
 
 📌 Vizualizar um estado geral da equipa.
 
+
 Treinador:
 
 📌 Vizualizar os componentes(jogadas e dicas);
@@ -180,6 +182,7 @@ Treinador:
 📌 Vizualizar as estatísticas dos atletas;    
 
 📌 Vizualizar um estado geral da equipa(com o premium aparece nos melhores marcadores o melhor marcador, e a equipa dele, registado).
+
 
 Administrador/Root:
 
