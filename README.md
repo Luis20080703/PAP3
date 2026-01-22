@@ -159,23 +159,23 @@ Este sistema faz com que o utilizador tenha restrições consoante o seu tipo.
 
 Atletas:
 
-    📌 Vizualizar os componentes(jogadas e dicas);
-    📌 Criar componentes
-    📌 Eliminar o componente que foi criado por ele; 
-    📌 Adicionar/modificar estatística dos jogos;    
-    📌 Vizualizar um estado geral da equipa.
+📌 Vizualizar os componentes(jogadas e dicas);
+📌 Criar componentes
+📌 Eliminar o componente que foi criado por ele; 
+📌 Adicionar/modificar estatística dos jogos;    
+📌 Vizualizar um estado geral da equipa.
 
 Treinador:
 
-    📌 Vizualizar os componentes(jogadas e dicas);
-    📌 Criar componentes
-    📌 Eliminar o componente que foi criado por os seus atletas e por ele; 
-    📌 Vizualizar as estatísticas dos atletas;    
-    📌 Vizualizar um estado geral da equipa(com o premium aparece nos melhores marcadores o melhor marcador ,e a equipa dele, registado).
+📌 Vizualizar os componentes(jogadas e dicas);
+📌 Criar componentes
+📌 Eliminar o componente que foi criado por os seus atletas e por ele; 
+📌 Vizualizar as estatísticas dos atletas;    
+📌 Vizualizar um estado geral da equipa(com o premium aparece nos melhores marcadores o melhor marcador ,e a equipa dele, registado).
 
 Administrador/Root:
 
-    📌 Sem restrições,só não cria jogadas e dicas, visto que não é membro de nenhuma equipa equipa.
+📌 Sem restrições,só não cria jogadas e dicas, visto que não é membro de nenhuma equipa equipa.
   
 </details>
 <details> <summary><strong>🚀 Execução Local</strong></summary> <br>
