@@ -114,7 +114,7 @@ O módulo de jogadas permite a partilha e análise tática de vídeos.
 <br>
 🎬 Upload de vídeos locais
 ▶️ Integração com YouTube (incluindo Shorts)
-📂 Categorias:
+📂 Categorias
 
     📌 Ataque
 
