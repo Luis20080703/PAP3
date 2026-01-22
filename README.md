@@ -112,9 +112,9 @@ Estatísticas de Equipa
 
 O módulo de jogadas permite a partilha e análise tática de vídeos só na sua equipa.
 
-Upload de vídeos locais
+-Upload de vídeos locais
 
-▶Integração com YouTube (incluindo Shorts)
+-Integração com YouTube (incluindo Shorts)
 
 Categorias:
 
