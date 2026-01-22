@@ -112,9 +112,9 @@ Estatísticas de Equipa
 
 O módulo de jogadas permite a partilha e análise tática de vídeos só na sua equipa.
 
-🎬 Upload de vídeos locais
+Upload de vídeos locais
 
-▶️ Integração com YouTube (incluindo Shorts)
+▶Integração com YouTube (incluindo Shorts)
 
 Categorias:
 
@@ -131,16 +131,16 @@ Categorias:
   📌 Bola parada.
 
 
-💬 Sistema de comentários
+Sistema de comentários
 
-✍️ Autoria identificada
+Autoria identificada
 
 </details>
 <details> <summary><strong>🎥 Sistema de dicas</strong></summary> <br>
 
 O módulo de dicas permite a partilha de dicas entre clubes.
 
-📊 Categorias:
+Categorias:
 
 📌 Fintas;
 
@@ -149,7 +149,8 @@ O módulo de dicas permite a partilha de dicas entre clubes.
 📌 Remates;
 
 📌 Defesa;
-    📌 Tácticas
+
+📌 Tácticas
   
 </details>
 <details> <summary><strong>🎥Sistema de premissões</strong></summary> <br>
