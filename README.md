@@ -115,9 +115,13 @@ O módulo de jogadas permite a partilha e análise tática de vídeos.
 🎬 Upload de vídeos locais
 ▶️ Integração com YouTube (incluindo Shorts)
 📂 Categorias:
+
     📌 Ataque
+
     📌 Defesa
+
     📌 Contra-ataque
+    
     📌 Guarda-redes
 
 💬 Sistema de comentários
