@@ -60,25 +60,25 @@
 <br>
 👤 Atletas
 
-  Registo sujeito a aprovação
+  📌 Registo sujeito a aprovação
 
-  Acesso limitado até validação
+  📌 Acesso limitado até validação
 
-  Visualizam apenas as suas estatísticas
+  📌 Visualizam apenas as suas estatísticas
 
 <br>
 🧑‍🏫 Treinadores
 
-  Aprovação por Administrador
+  📌 Aprovação por Administrador
 
-  Gestão de atletas da sua equipa
+  📌 Gestão de atletas da sua equipa
 
 <br>
 🛠️ Administradores
 
-  Controlo total da plataforma
+  📌 Controlo total da plataforma
 
-  Gestão de utilizadores, equipas e conteúdos
+  📌 Gestão de utilizadores, equipas e conteúdos
 
 </details>
 <details> <summary><strong>📊 Gestão de Estatísticas</strong></summary> <br>
@@ -120,13 +120,13 @@ Estatísticas de Equipa
 
   📂 Categorias:
 
-    • Ataque
+    📌 Ataque
 
-    • Defesa
+    📌 Defesa
 
-    • Contra-ataque
+    📌 Contra-ataque
 
-    • Guarda-redes
+    📌 Guarda-redes
 
   💬 Sistema de comentários
 
@@ -135,16 +135,17 @@ Estatísticas de Equipa
 </details>
 <details> <summary><strong>🚀 Execução Local</strong></summary> <br>
 Backend
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-php artisan serve
+
+    📌 composer install
+    📌 cp .env.example .env
+    📌 php artisan key:generate
+    📌 php artisan migrate --seed
+    📌 php artisan serve
 
 <br>
 Frontend
-npm install
-npm run dev
+    📌 npm install
+    📌 npm run dev
 
 </details>
 <details> <summary><strong>🏁 Conclusão</strong></summary> <br>
