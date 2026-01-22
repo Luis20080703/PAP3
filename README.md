@@ -118,19 +118,18 @@ O módulo de jogadas permite a partilha e análise tática de vídeos só na sua
 
 📊 Categorias
 
-📌 Contra-ataque;
+  📌 Contra-ataque;
 
-📌 Ataque posicional;
+  📌 Ataque posicional;
 
-📌 Técnica individual;
+  📌 Técnica individual;
 
-📌 Defesa;
+  📌 Defesa;
 
-📌 Transição;
+  📌 Transição;
 
-📌 Bola parada.
+  📌 Bola parada.
 
-  
 
 💬 Sistema de comentários
 
@@ -141,12 +140,15 @@ O módulo de jogadas permite a partilha e análise tática de vídeos só na sua
 
 O módulo de dicas permite a partilha de dicas entre clubes.
 
-Categorias:
+📊 Categorias:
 
-    📌 Fintas
-    📌 Dribles
-    📌 Remates
-    📌 Defesa
+📌 Fintas;
+
+📌 Dribles;
+
+📌 Remates;
+
+📌 Defesa;
     📌 Tácticas
   
 </details>
