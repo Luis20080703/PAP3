@@ -119,12 +119,12 @@ O módulo de jogadas permite a partilha e análise tática de vídeos só na sua
 
 Categorias:
 
-    📌 Contra-ataque
-    📌 Ataque posicional
-    📌 Técnica individual
-    📌 Defesa
-    📌 Transição
-    📌 Bola parada
+  📌 Contra-ataque
+  📌 Ataque posicional
+  📌 Técnica individual
+  📌 Defesa
+  📌 Transição
+  📌 Bola parada
 
   
 
