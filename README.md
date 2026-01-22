@@ -110,28 +110,64 @@ Estatísticas de Equipa
 </details>
 <details> <summary><strong>🎥 Sistema de Jogadas em Vídeo</strong></summary> <br>
 
-O módulo de jogadas permite a partilha e análise tática de vídeos.
+O módulo de jogadas permite a partilha e análise tática de vídeos só na sua equipa.
 
 🎬 Upload de vídeos locais
 
 ▶️ Integração com YouTube (incluindo Shorts)
 
-Estatísticas de Equipa
+Categorias:
 
-  📊 Agregação automática dos atletas
+    📌 Contra-ataque
+    📌 Ataque posicional
+    📌 Técnica individual
+    📌 Defesa
+    📌 Transição
+    📌 Bola parada
 
-  🏅 Rankings (Top 5 marcadores)
-
-  🚨 Análise disciplinar da equipa
+  
 
 💬 Sistema de comentários
 
 ✍️ Autoria identificada
 
-💬 Sistema de comentários
+</details>
+<details> <summary><strong>🎥 Sistema de dicas</strong></summary> <br>
 
-✍️ Autoria identificada
+O módulo de dicas permite a partilha de dicas entre clubes.
 
+Categorias:
+
+    📌 Fintas
+    📌 Dribles
+    📌 Remates
+    📌 Defesa
+    📌 Tácticas
+  
+</details>
+<details> <summary><strong>🎥Sistema de premissões</strong></summary> <br>
+
+Este sistema faz com que o utilizador tenha restrições consoante o seu tipo.
+
+Atletas:
+
+    📌 Vizualizar os componentes(jogadas e dicas);
+    📌 Criar componentes
+    📌 Eliminar o componente que foi criado por ele; 
+    📌 Adicionar/modificar estatística dos jogos;    
+    📌 Vizualizar um estado geral da equipa.
+Treinador:
+
+    📌 Vizualizar os componentes(jogadas e dicas);
+    📌 Criar componentes
+    📌 Eliminar o componente que foi criado por os seus atletas e por ele; 
+    📌 Vizualizar as estatísticas dos atletas.;    
+    📌 Vizualizar um estado geral da equipa(com o premium aparece nos melhores marcadores o melhor marcador ,e a equipa dele, registado).
+
+Administrador/Root:
+
+    📌 Sem restrições,só não cria jogadas e dicas, visto que não é membro de nenhuma equipa equipa.
+  
 </details>
 <details> <summary><strong>🚀 Execução Local</strong></summary> <br>
 Backend:
