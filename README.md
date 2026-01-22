@@ -115,7 +115,9 @@ O módulo de jogadas permite a partilha e análise tática de vídeos só na sua
 🎬 Upload de vídeos locais
 
 ▶️ Integração com YouTube (incluindo Shorts)
-📊 Categorias:
+
+📊 Categorias
+
 📌 Contra-ataque
 📌 Ataque posicional
 📌 Técnica individual
