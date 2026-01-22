@@ -114,12 +114,11 @@ Estatísticas de Equipa
 
 <br>
 
-  🎬 Upload de vídeos locais
+🎬 Upload de vídeos locais
 
-  ▶️ Integração com YouTube (incluindo Shorts)
+▶️ Integração com YouTube (incluindo Shorts)
 
-  📂 Categorias:
-
+📂 Categorias:
     📌 Ataque
 
     📌 Defesa
@@ -128,24 +127,25 @@ Estatísticas de Equipa
 
     📌 Guarda-redes
 
-  💬 Sistema de comentários
+💬 Sistema de comentários
 
-  ✍️ Autoria identificada
+✍️ Autoria identificada
 
 </details>
 <details> <summary><strong>🚀 Execução Local</strong></summary> <br>
-Backend
+Backend:
 
-    📌 composer install
-    📌 cp .env.example .env
-    📌 php artisan key:generate
-    📌 php artisan migrate --seed
-    📌 php artisan serve
+    composer install && \
+    cp .env.example .env && \
+    php artisan key:generate && \
+    php artisan migrate --seed && \
+    php artisan serve
 
 <br>
 Frontend
-    📌 npm install
-    📌 npm run dev
+
+    npm install && \
+    npm run dev && \
 
 </details>
 <details> <summary><strong>🏁 Conclusão</strong></summary> <br>
