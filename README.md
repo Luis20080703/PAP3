@@ -111,18 +111,22 @@ Estatísticas de Equipa
 <details> <summary><strong>🎥 Sistema de Jogadas em Vídeo</strong></summary> <br>
 
 O módulo de jogadas permite a partilha e análise tática de vídeos.
-<br>
+
 🎬 Upload de vídeos locais
+
 ▶️ Integração com YouTube (incluindo Shorts)
-📂 Categorias
 
-    📌 Ataque
+Estatísticas de Equipa
 
-    📌 Defesa
+  📊 Agregação automática dos atletas
 
-    📌 Contra-ataque
-    
-    📌 Guarda-redes
+  🏅 Rankings (Top 5 marcadores)
+
+  🚨 Análise disciplinar da equipa
+
+💬 Sistema de comentários
+
+✍️ Autoria identificada
 
 💬 Sistema de comentários
 
