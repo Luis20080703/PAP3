@@ -1,0 +1,22 @@
+// INSTRUÇÃO DE CORREÇÃO PARA api.ts
+// 
+// Localize as linhas 96-120 no ficheiro:
+// c:\PAP3\Andebolonlineplatform-main\src\services\api.ts
+//
+// APAGUE todo o bloco de código que começa com:
+//     // ✅ CHECK FOR 403 (Forbidden) - Admin privileges lost
+//     if (response.status === 403) {
+//       ...
+//     }
+//
+// E SUBSTITUA por este código simples:
+
+    // ✅ LOG 403 errors but don't force logout (token may be valid but from different session)
+    if (response.status === 403) {
+      console.warn('⚠️ Acesso negado (403). Verifique se tem privilégios suficientes.');
+    }
+
+// Isto vai:
+// 1. Manter o utilizador logado mesmo com erro 403
+// 2. Apenas mostrar um aviso no console
+// 3. Permitir que o erro seja tratado normalmente pelas funções API

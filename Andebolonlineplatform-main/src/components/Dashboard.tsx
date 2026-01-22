@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Tabs, TabsContent } from './ui/tabs';
-import { BookOpen, TrendingUp, Users } from 'lucide-react';
 import { PlaysSection } from './PlaysSection';
 import { TipsSection } from './TipsSection';
 import { TeamStatsSection } from './TeamStatsSection';
@@ -38,15 +37,17 @@ export function Dashboard({ onLogout, onNavigateToPremium }: DashboardProps) {
           onLogout={onLogout}
         />
         <SidebarInset className="flex-1 overflow-auto bg-transparent">
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white/80 backdrop-blur px-6 md:px-8 shadow-sm">
-            <SidebarTrigger />
-            <div className="flex-1" />
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-gray-400 uppercase md:block hidden">Modo Administrador</span>
-              <h1 className="flex items-center gap-2 text-lg md:text-xl font-bold">
-                <img src="/logo.png" alt="NexusHand Logo" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-                <span className="animate-text-shine">NexusHand</span>
-              </h1>
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-white/95 backdrop-blur px-4 md:px-8 shadow-sm">
+            <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8" />
+
+            <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hidden sm:block truncate">Modo Administrador</span>
+              <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="NexusHand Logo" className="w-8 h-8 md:w-12 md:h-12 object-contain flex-shrink-0" />
+                <h1 className="text-sm md:text-xl font-black tracking-tight text-blue-600 animate-text-shine">
+                  NexusHand
+                </h1>
+              </div>
             </div>
           </header>
 

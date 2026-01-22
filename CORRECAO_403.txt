@@ -1,0 +1,19 @@
+// ✅ SOLUÇÃO PARA O PROBLEMA DE 403 AO SINCRONIZAR
+
+// Adicione este código na linha 106 do api.ts, substituindo a condição existente:
+
+// Apenas força logout se o utilizador NÃO for admin
+if (!['admin', 'root'].includes(user.tipo)) {
+  console.error('❌ Sessão substituída por utilizador não-admin.');
+  localStorage.removeItem('current_user');
+  localStorage.removeItem('api_token');
+  if (typeof window !== 'undefined') {
+    alert('Sessão substituída. Faça login novamente.');
+    window.location.href = '/';
+  }
+  throw new Error('Sessão inválida.');
+} else {
+  // Se for admin mas recebeu 403, apenas loga o erro
+  console.warn('⚠️ Admin recebeu 403. Token pode ter sido substituído.');
+  console.warn('💡 Faça logout manual e login novamente.');
+}

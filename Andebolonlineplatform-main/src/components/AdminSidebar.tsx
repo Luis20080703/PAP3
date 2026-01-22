@@ -4,12 +4,10 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
     SidebarGroup,
     SidebarGroupLabel,
     SidebarGroupContent,
+    SidebarMenuButton,
     SidebarRail,
     useSidebar,
 } from "./ui/sidebar";
@@ -20,7 +18,6 @@ import {
     Users,
     Shield,
     LogOut,
-    Trophy,
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { cn } from "./ui/utils";
@@ -33,8 +30,8 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarProps) {
     const { user } = useApp();
-    const { state } = useSidebar();
-    const isExpanded = state === "expanded";
+    const { state, isMobile } = useSidebar();
+    const isExpanded = state === "expanded" || isMobile;
 
     const menuItems = [
         { id: "plays", label: "Jogadas", icon: Upload, color: "text-emerald-500" },
@@ -45,9 +42,9 @@ export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarP
     ];
 
     return (
-        <Sidebar className="border-r border-gray-100 bg-white shadow-xl" collapsible="offcanvas">
-            <SidebarHeader className="p-6">
-                <div className="flex items-center gap-3 px-2">
+        <Sidebar className="border-r border-gray-100 bg-white shadow-xl h-svh overflow-hidden" collapsible="offcanvas">
+            <SidebarHeader className="p-3 md:p-4">
+                <div className="flex items-center gap-3 px-1">
                     <img src="/logo.png" alt="NexusHand Logo" className="w-10 h-10 object-contain" />
                     {isExpanded && (
                         <div className="flex flex-col overflow-hidden">
@@ -62,16 +59,16 @@ export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarP
                 </div>
             </SidebarHeader>
 
-            <SidebarContent className="px-2 py-6">
+            <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200">
                 <SidebarGroup>
                     {isExpanded && (
-                        <SidebarGroupLabel className="px-4 text-xs font-black text-gray-400 uppercase tracking-widest mb-6">
+                        <SidebarGroupLabel className="px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
                             Navegação
                         </SidebarGroupLabel>
                     )}
-                    <SidebarGroupContent>
+                    <SidebarGroupContent className="px-2">
                         <div className="radio-container" style={{ "--total-radio": menuItems.length } as React.CSSProperties}>
-                            {menuItems.map((item, index) => (
+                            {menuItems.map((item) => (
                                 <React.Fragment key={item.id}>
                                     <input
                                         type="radio"
@@ -85,7 +82,7 @@ export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarP
                                             "w-5 h-5 transition-all duration-300",
                                             activeTab === item.id ? item.color : "text-gray-400"
                                         )} />
-                                        {isExpanded && <span className="text-sm">{item.label}</span>}
+                                        {isExpanded && <span className="text-sm font-bold">{item.label}</span>}
                                     </label>
                                 </React.Fragment>
                             ))}
@@ -97,15 +94,15 @@ export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarP
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter className="p-4 border-t border-gray-50 space-y-4">
+            <SidebarFooter className="p-3 border-t border-gray-50 bg-white space-y-2 flex-shrink-0 mt-auto">
                 {/* User Card */}
-                <div className="bg-gray-50/50 p-4 rounded-3xl border border-gray-100 flex items-center gap-3 overflow-hidden">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 font-black flex-shrink-0">
+                <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100 flex items-center gap-3 overflow-hidden">
+                    <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-black flex-shrink-0 text-xs">
                         {user?.nome?.charAt(0).toUpperCase()}
                     </div>
                     {isExpanded && (
-                        <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-bold text-gray-900 truncate">{user?.nome}</p>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-gray-900 truncate">{user?.nome}</p>
                             <p className="text-[10px] font-black text-gray-400 uppercase truncate">
                                 {user?.tipo}
                             </p>
@@ -117,12 +114,12 @@ export function AdminSidebar({ activeTab, onTabChange, onLogout }: AdminSidebarP
                 <SidebarMenuButton
                     onClick={onLogout}
                     className={cn(
-                        "w-full flex items-center gap-3 px-4 py-6 rounded-2xl text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all font-bold group border border-transparent hover:border-rose-100",
+                        "w-full flex items-center gap-3 px-4 py-5 rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all font-black text-xs group border border-transparent hover:border-rose-100",
                         !isExpanded && "justify-center px-0"
                     )}
                 >
-                    <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform flex-shrink-0" />
-                    {isExpanded && <span>Sair</span>}
+                    <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform flex-shrink-0" />
+                    {isExpanded && <span className="uppercase tracking-tight">Sair</span>}
                 </SidebarMenuButton>
             </SidebarFooter>
             <SidebarRail />

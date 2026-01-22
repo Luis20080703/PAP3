@@ -1,143 +1,164 @@
 # 🏆 NexusHand — Plataforma de Andebol
 
-> **"Andebol mais que um desporto"**
+“Andebol — mais do que um desporto.”
 
-## 📋 Resumo Executivo
+📌 Visão Geral
 
-**NexusHand** é uma plataforma web fullstack inovadora desenvolvida para revolucionar a gestão de equipas de andebol. Centraliza estatísticas, análise de vídeo (jogadas), dicas técnicas e gestão de equipas numa interface moderna e intuitiva. O projeto visa profissionalizar a gestão desportiva servindo tanto atletas como treinadores.
+NexusHand é uma plataforma web full-stack para a gestão profissional de equipas de andebol, integrando estatísticas, jogadas em vídeo e gestão desportiva.
 
----
+<details> <summary><strong>🎯 Objetivos do Projeto</strong></summary>
 
-## 🏗️ Arquitetura e Tecnologias
+Digitalizar a gestão desportiva no andebol
 
-A solução utiliza uma arquitetura moderna separando Frontend e Backend:
+Facilitar a análise de desempenho individual e coletivo
 
-### **Frontend (`Andebolonlineplatform-main/`)**
-- **Core:** React 18, TypeScript, Vite
-- **UI/UX:** Tailwind CSS, Shadcn/ui
-- **Funcionalidades:** SPA (Single Page Application), Gestão de Estado Global, PWA ready.
+Promover a partilha de jogadas e conhecimento técnico
 
-### **Backend (`Api/`)**
-- **Core:** Laravel 12 (PHP 8.2+)
-- **Base de Dados:** SQLite
-- **API:** RESTful, Autenticação Sanctum
-- **Segurança:** Validação de dados.
+Criar uma plataforma segura, moderna e escalável
 
----
+</details>
+<details> <summary><strong>🏗️ Arquitetura da Solução</strong></summary>
+🎨 Frontend — React
 
-## ⚙️ Funcionalidades e Relatório Técnico
+React 18 + TypeScript
 
-### 🔐 1. Sistema de Autenticação e Perfis
-O sistema utiliza **Laravel Sanctum** para autenticação segura baseada em tokens.
+Vite
 
-- **Atletas:** O registo requer **aprovação de um Treinador ou Administrador**. Até lá, o acesso é limitado.
-- **Treinadores:** O registo requer **aprovação de um Administrador**. Até lá, o acesso é limitado.
-- **Administradores:** Têm controlo total sobre a plataforma (gestão de equipas, utilizadores e conteúdos).
+Tailwind CSS + Shadcn/ui
 
-**Permissões (ACL):**
-- Os dados são isolados: atletas só veem as suas estatísticas; treinadores só veem a sua equipa.
+SPA + PWA
 
-### 📊 2. Gestão de Estatísticas Desportivas
-A plataforma calcula e apresenta métricas detalhadas para análise de performance.
+Design responsivo
 
-**Estatísticas de Atleta:**
-- **Entrada de Dados:** Registo de golos, cartões (amarelo/vermelho), exclusões (2 minutos) e jogos disputados.
-- **Cálculo Automático:** Médias de golos por jogo e totais acumulados.
-- **Visualização:** Dashboard pessoal com gráficos e indicadores de progresso.
+⚙️ Backend — Laravel
 
-**Estatísticas de Equipa:**
-- **Agregação:** Soma automática das estatísticas de todos os atletas da equipa.
-- **Rankings:** Tabelas de "Melhores Marcadores" (Top 5).
-- **Cartões e Disciplina:** Visão geral das sanções da equipa.
+Laravel 12 (PHP 8.2+)
 
-### 🎥 3. Sistema de Vídeo e Análise Tática (Jogadas)
-Módulo central para partilha e análise de vídeos de andebol.
+SQLite
 
-- **Formatos Suportados:**
-    - **YouTube:** Integração nativa (inclui suporte a Shorts).
-    - **Ficheiros Locais:** Upload de vídeos diretamente para a plataforma.
-- **Metadados:** Categorização (Ataque, Defesa, Contra-ataque, Guarda-redes), Título e Descrição.
-- **Social:**
-    - **Comentários:** Discussão tática contextualizada em cada vídeo.
-    - **Autoria:** Identificação clara de quem submeteu a jogada (Atleta ou Treinador).
+API REST
 
-### 👥 4. Administração e Gestão de Equipas
-Ferramentas dedicadas para a organização estrutural do clube/equipa.
+Autenticação Sanctum
 
-- **Dashboard Administrativo:**
-    - Criação e edição de Equipas.
-    - Validação de registos de Treinadores pendentes.
-    - Moderação de conteúdo (capacidade de apagar jogadas ou comentários impróprios).
-- **Escalões:** Gestão de diferentes categorias etárias.
+</details>
+<details> <summary><strong>🔐 Sistema de Autenticação e Perfis</strong></summary>
+👤 Atletas
 
-### 💡 5. Dicas e Partilha de Conhecimento
-Secção dedicada ao conteúdo educacional.
-- Partilha de artigos ou pequenas dicas sobre técnica, tática, preparação física e mental.
-- Categorização por tipo de conteúdo.
+Registo sujeito a aprovação
 
----
+Acesso limitado até validação
 
-## 📱 Interface e Experiência (UX/UI)
-- **Design System:** Baseado em **Tailwind CSS** e **Shadcn/ui** para uma aparência clean e moderna.
-- **Responsividade:** Totalmente adaptado para dispositivos móveis (Mobile-first).
-- **Feedback Visual:** Spinners de carregamento, Toasts para sucesso/erro e tratamentos de estados vazios.
+Apenas veem as suas estatísticas
 
----
+🧑‍🏫 Treinadores
 
-## 🚀 Como Executar Localmente
+Validados por Administrador
 
-### Pré-requisitos
-- PHP 8.2+, Composer
-- Node.js, npm
+Gerem atletas da sua equipa
 
+🛠️ Administradores
 
-### 1. Configurar o Backend (Laravel)
+Gestão total da plataforma
 
-```powershell
-cd C:\PAP3\Api
+Moderação e validações
 
-# 1. Instalar dependências PHP
+</details>
+<details> <summary><strong>📊 Gestão de Estatísticas</strong></summary>
+Estatísticas de Atleta
+
+Golos
+
+Cartões
+
+Exclusões (2 minutos)
+
+Jogos
+
+Médias automáticas
+
+Estatísticas de Equipa
+
+Soma automática dos atletas
+
+Rankings (Top 5 marcadores)
+
+Estatísticas disciplinares
+
+</details>
+<details> <summary><strong>🎥 Sistema de Jogadas (Vídeo)</strong></summary>
+
+Upload de vídeos locais
+
+Integração com YouTube (inclui Shorts)
+
+Categorias:
+
+Ataque
+
+Defesa
+
+Contra-ataque
+
+Guarda-redes
+
+Comentários e autoria identificada
+
+</details>
+<details> <summary><strong>💡 Dicas Técnicas</strong></summary>
+
+Partilha de artigos e dicas
+
+Técnica, tática e preparação física
+
+Conteúdo categorizado
+
+</details>
+<details> <summary><strong>🧑‍💼 Administração e Gestão</strong></summary>
+
+Criação de equipas
+
+Gestão de escalões
+
+Validação de treinadores
+
+Moderação de conteúdos
+
+</details>
+<details> <summary><strong>📱 Interface e UX/UI</strong></summary>
+
+Design moderno
+
+Mobile-first
+
+Feedback visual (toasts, loaders, estados vazios)
+
+</details>
+<details> <summary><strong>🚀 Executar o Projeto Localmente</strong></summary>
+Backend
 composer install
-
-# 2. Configurar ambiente
-# Copie o .env.example para .env e configure os dados da Base de Dados (DB_DATABASE, DB_USERNAME, etc.)
 cp .env.example .env
 php artisan key:generate
+php artisan migrate --seed
+php artisan serve
 
-# 3. Migrar Base de Dados
-php artisan migrate --seed    # --seed é opcional para dados de teste
-
-# 4. Iniciar Servidor API
-php artisan serve --host=127.0.0.1 --port=8000
-```
-
-### 2. Configurar o Frontend (React)
-
-```powershell
-cd C:\PAP3\Andebolonlineplatform-main
-
-# 1. Instalar dependências JS
+Frontend
 npm install
-
-# 2. Iniciar Servidor de Desenvolvimento
 npm run dev
-# Aceda a http://localhost:5173 (ou porta indicada)
-```
 
-**Nota:** Certifique-se que o ficheiro `.env` (ou configuração do axios) no Frontend aponta para a URL correta da API (`http://127.0.0.1:8000`).
+</details>
+<details> <summary><strong>📚 API — Endpoints</strong></summary>
+Método	Endpoint	Descrição
+POST	/login	Autenticação
+POST	/register	Registo
+GET	/equipas	Equipas
+GET	/estatisticas-atletas	Estatísticas do atleta
+GET	/estatisticas-equipas	Estatísticas da equipa
+GET	/jogadas	Jogadas
+</details>
+<details> <summary><strong>🏁 Conclusão</strong></summary>
 
----
+O NexusHand é uma plataforma moderna, segura e funcional que contribui para a profissionalização da gestão no andebol, integrando tecnologia e análise desportiva.
 
-## 📚 Documentação da API
+Projeto desenvolvido no âmbito da PAP — Programação e Sistemas de Informação.
 
-Alguns dos principais endpoints disponíveis (`/api`):
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `POST` | `/login` | Autenticação de utilizadores |
-| `POST` | `/register` | Registo de novos utilizadores |
-| `GET`  | `/equipas` | Listagem de equipas disponíveis |
-| `GET`  | `/estatisticas-atletas` | Dados individuais do atleta autenticado |
-| `GET`  | `/estatisticas-equipas` | Dados agregados da equipa |
-| `GET`  | `/jogadas` | Feed de vídeos/jogadas da equipa |
-
+</details>

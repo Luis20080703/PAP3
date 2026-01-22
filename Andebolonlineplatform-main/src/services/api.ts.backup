@@ -8,25 +8,25 @@
   UserType
 } from '../types';
 
-// ✅ FUNÇÃO ATUALIZADA PARA CONVERTER TIPOS
+// âœ… FUNÃ‡ÃƒO ATUALIZADA PARA CONVERTER TIPOS
 const mapUserType = (laravelType: string): 'atleta' | 'treinador' => {
   return laravelType === 'atleta' ? 'atleta' : 'treinador';
 };
 
-// ✅ URL CENTRALIZADA DO SERVIDOR - DINÂMICA
+// âœ… URL CENTRALIZADA DO SERVIDOR - DINAÌ‚MICA
 const getAPIBaseURL = () => {
   if (typeof window === 'undefined') {
     return 'http://localhost:8000/api';
   }
 
-  // ✅ VERIFICAR SE HÁ UM IP CONFIGURADO MANUALMENTE (para acesso móvel)
+  // âœ… VERIFICAR SE HÃ UM IP CONFIGURADO MANUALMENTE (para acesso mÃ³vel)
   const manualServerIP = localStorage.getItem('server_ip');
   if (manualServerIP) {
-    console.log('🌐 Usando IP manual do servidor:', manualServerIP);
+    console.log('ðŸŒ Usando IP manual do servidor:', manualServerIP);
     return `http://${manualServerIP}:8000/api`;
   }
 
-  // ✅ DETECÇÃO AUTOMÁTICA
+  // âœ… DETECÃ‡ÃƒO AUTOMÃTICA
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:8000/api';
   }
@@ -47,17 +47,14 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
     Object.assign(headers, options.headers);
   }
 
-  // ✅ Prioritize token from sessionStorage (tab-specific) then fallback to localStorage
+  // Add Authorization header automatically if api_token is present and not already provided
   try {
-    const sessionToken = sessionStorage.getItem('api_token');
-    const localToken = localStorage.getItem('api_token');
-    const token = sessionToken || localToken;
-
+    const token = localStorage.getItem('api_token');
     if (token && !headers['Authorization']) {
       headers['Authorization'] = `Bearer ${token}`;
     }
   } catch (e) {
-    // Storage may be unavailable in some contexts
+    // localStorage may be unavailable in some contexts; ignore silently
   }
 
   let response: Response;
@@ -84,21 +81,42 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
   }
 
   if (!response.ok) {
-    // ✅ CHECK FOR 401 (Unauthenticated) AND FORCE LOGOUT
+    // âœ… CHECK FOR 401 (Unauthenticated) AND FORCE LOGOUT
     if (response.status === 401) {
-      console.warn('⚠️ Sessão expirada ou inválida. A terminar sessão...');
+      console.warn('âš ï¸ SessÃ£o expirada ou invÃ¡lida. A terminar sessÃ£o...');
       localStorage.removeItem('current_user');
       localStorage.removeItem('api_token');
       if (typeof window !== 'undefined') {
         window.location.href = '/'; // Reload to login page
       }
       // Stop here
-      throw new Error('Sessão expirada. Por favor faça login novamente.');
+      throw new Error('SessÃ£o expirada. Por favor faÃ§a login novamente.');
     }
 
-    // ✅ CHECK FOR 403 (Forbidden) - Just log warning to console
+    // âœ… CHECK FOR 403 (Forbidden) - Admin privileges lost
     if (response.status === 403) {
-      console.warn('⚠️ Acesso negado (403). Possível troca de sessão entre separadores.');
+      console.warn('âš ï¸ Acesso negado. Verificando privilÃ©gios...');
+
+      // Check if current user lost admin privileges (e.g., token replaced by another login)
+      try {
+        const currentUser = localStorage.getItem('current_user');
+        if (currentUser) {
+          const user = JSON.parse(currentUser);
+          // If user is not admin/root, they shouldn't be accessing admin endpoints
+          if (!['admin', 'root'].includes(user.tipo)) {
+            console.error('âŒ SessÃ£o de admin substituÃ­da por outro utilizador. A terminar sessÃ£o...');
+            localStorage.removeItem('current_user');
+            localStorage.removeItem('api_token');
+            if (typeof window !== 'undefined') {
+              alert('A sua sessÃ£o de administrador foi substituÃ­da por outro login. Por favor, faÃ§a login novamente.');
+              window.location.href = '/';
+            }
+            throw new Error('SessÃ£o de admin invÃ¡lida. FaÃ§a login novamente como administrador.');
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao verificar privilÃ©gios:', e);
+      }
     }
 
     let errorMessage = `API error: ${response.status} ${response.statusText}`;
@@ -115,6 +133,16 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
     throw new Error(errorMessage);
   }
 
+  // âœ… CHECK FOR 401 (Unauthenticated) AND FORCE LOGOUT
+  if (response.status === 401) {
+    console.warn('âš ï¸ SessÃ£o expirada ou invÃ¡lida. A terminar sessÃ£o...');
+    localStorage.removeItem('current_user');
+    localStorage.removeItem('api_token');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/'; // Reload to login page
+    }
+  }
+
   return response.json();
 }
 
@@ -129,22 +157,20 @@ export const authAPI = {
 
       if (response.success && response.user) {
         localStorage.setItem('current_user', JSON.stringify(response.user));
-        sessionStorage.setItem('current_user', JSON.stringify(response.user));
         if (response.token) {
           localStorage.setItem('api_token', response.token);
-          sessionStorage.setItem('api_token', response.token);
         }
         return response.user;
       } else {
         throw new Error(response.message || 'Login falhou');
       }
     } catch (apiError: any) {
-      throw apiError; // Throw the actual error
+      throw apiError; // Throw the actual error (e.g., "Sua conta aguarda aprovaÃ§Ã£o...")
     }
   },
 
   async register(userData: any): Promise<User> {
-    console.log('🎯 [REGISTER API] Dados recebidos:', userData);
+    console.log('ðŸŽ¯ [REGISTER API] Dados recebidos:', userData);
 
     const { nome, email, password, tipo, equipa, posicao, numero } = userData;
 
@@ -166,7 +192,7 @@ export const authAPI = {
       registerData.escalao = userData.escalao;
     }
 
-    console.log('📤 [REGISTER API] Dados COMPLETOS a enviar para Laravel:', registerData);
+    console.log('ðŸ“¤ [REGISTER API] Dados COMPLETOS a enviar para Laravel:', registerData);
 
     try {
       const response = await fetch(`${API_BASE_URL}/register`, {
@@ -179,19 +205,17 @@ export const authAPI = {
       });
 
       const result = await response.json();
-      console.log('📥 [REGISTER API] Resposta do Laravel:', result);
+      console.log('ðŸ“¥ [REGISTER API] Resposta do Laravel:', result);
 
       if (result.success && result.user) {
         const userData = result.user;
-        console.log('✅ REGISTRO BEM-SUCEDIDO!');
+        console.log('âœ… REGISTRO BEM-SUCEDIDO!');
         localStorage.setItem('current_user', JSON.stringify(userData));
-        sessionStorage.setItem('current_user', JSON.stringify(userData));
 
-        // ✅ GUARDAR TOKEN PARA AUTO-LOGIN (Ambos os storages)
+        // âœ… GUARDAR TOKEN PARA AUTO-LOGIN
         if (result.token) {
           localStorage.setItem('api_token', result.token);
-          sessionStorage.setItem('api_token', result.token);
-          console.log('🔑 Token guardado em local e session storage');
+          console.log('ðŸ”‘ Token guardado automaticamente apÃ³s registo');
         }
 
         return userData;
@@ -200,7 +224,7 @@ export const authAPI = {
       }
 
     } catch (error: any) {
-      console.error('❌ ERRO NO REGISTER API:', error);
+      console.error('âŒ ERRO NO REGISTER API:', error);
       throw error;
     }
   },
@@ -208,15 +232,11 @@ export const authAPI = {
   async logout(): Promise<void> {
     localStorage.removeItem('current_user');
     localStorage.removeItem('api_token');
-    sessionStorage.removeItem('current_user');
-    sessionStorage.removeItem('api_token');
-    console.log('🚪 Sessão encerrada em todos os storages');
+    console.log('ðŸšª SessÃ£o encerrada (User e Token removidos)');
   },
 
   getCurrentUser(): User | null {
-    const sessionUser = sessionStorage.getItem('current_user');
-    const localUser = localStorage.getItem('current_user');
-    const user = sessionUser || localUser;
+    const user = localStorage.getItem('current_user');
     return user ? JSON.parse(user) : null;
   },
 
@@ -239,9 +259,9 @@ export const usersAPI = {
 export const playsAPI = {
   async getAll(): Promise<PlayDisplay[]> {
     try {
-      console.log('🔄 [PLAYS API] Buscando jogadas...');
+      console.log('ðŸ”„ [PLAYS API] Buscando jogadas...');
       const response = await apiCall('/jogadas');
-      console.log('📥 [PLAYS API] Resposta recebida:', response);
+      console.log('ðŸ“¥ [PLAYS API] Resposta recebida:', response);
 
       const [usersResponse, equipasResponse, comentariosResponse] = await Promise.all([
         apiCall('/users').catch(() => ({ data: [] })),
@@ -253,9 +273,9 @@ export const playsAPI = {
       const equipas = equipasResponse.data || [];
       const todosComentarios = comentariosResponse.data || [];
 
-      console.log('👥 [PLAYS API] Users disponíveis:', users.length);
-      console.log('🏆 [PLAYS API] Equipas disponíveis:', equipas.length);
-      console.log('💬 [PLAYS API] Comentários disponíveis:', todosComentarios.length);
+      console.log('ðŸ‘¥ [PLAYS API] Users disponÃ­veis:', users.length);
+      console.log('ðŸ† [PLAYS API] Equipas disponÃ­veis:', equipas.length);
+      console.log('ðŸ’¬ [PLAYS API] ComentÃ¡rios disponÃ­veis:', todosComentarios.length);
 
       const plays = response.data.map((play: any) => {
         const comentariosDaJogada = todosComentarios.filter((comentario: any) =>
@@ -265,24 +285,24 @@ export const playsAPI = {
         const autor = users.find((u: any) => u.id === play.user_id);
         const equipa = equipas.find((e: any) => e.id === play.equipa_id);
 
-        // ✅ GERAR URL COMPLETA PARA VÍDEOS
+        // âœ… GERAR URL COMPLETA PARA VÃDEOS
         const videoUrl = play.ficheiro?.startsWith('videos/')
           ? `${API_BASE_URL.replace('/api', '')}/storage/${play.ficheiro}`
           : play.video_url || play.ficheiro;
 
-        // ✅ NORMALIZAR CATEGORIAS
+        // âœ… NORMALIZAR CATEGORIAS
         const rawCategory = play.categoria || this.determinarCategoria(play.descricao);
         let normalizedCategory = rawCategory;
 
         if (rawCategory === 'Jogada Ofensiva') normalizedCategory = 'Ataque posicional';
         else if (rawCategory === 'Jogada Defensiva') normalizedCategory = 'Defesa';
         else if (rawCategory === 'Bola Parada') normalizedCategory = 'Bola parada';
-        else if (rawCategory === 'Geral') normalizedCategory = 'Técnica individual';
+        else if (rawCategory === 'Geral') normalizedCategory = 'TÃ©cnica individual';
 
         return {
           id: play.id.toString(),
-          titulo: play.titulo || 'Sem título',
-          descricao: play.descricao || 'Sem descrição',
+          titulo: play.titulo || 'Sem tÃ­tulo',
+          descricao: play.descricao || 'Sem descriÃ§Ã£o',
           urlVideo: videoUrl,
           autorId: play.user_id?.toString() || '1',
           autorNome: autor?.nome || 'Utilizador Desconhecido',
@@ -302,29 +322,29 @@ export const playsAPI = {
         };
       });
 
-      console.log('✅ [PLAYS API] Jogadas processadas:', plays.length);
+      console.log('âœ… [PLAYS API] Jogadas processadas:', plays.length);
       return plays;
 
     } catch (error) {
-      console.error('❌ [PLAYS API] Erro a buscar jogadas:', error);
+      console.error('âŒ [PLAYS API] Erro a buscar jogadas:', error);
       return [];
     }
   },
 
   determinarCategoria(descricao: string): string {
-    if (!descricao) return 'Técnica individual';
+    if (!descricao) return 'TÃ©cnica individual';
 
     const desc = descricao.toLowerCase();
 
-    // ✅ MAPEAMENTO PARA OPÇÕES VÁLIDAS DO SELECT
-    if (desc.includes('contra-ataque') || desc.includes('transição rápida')) return 'Contra-ataque';
+    // âœ… MAPEAMENTO PARA OPÃ‡Ã•ES VÃLIDAS DO SELECT
+    if (desc.includes('contra-ataque') || desc.includes('transiÃ§Ã£o rÃ¡pida')) return 'Contra-ataque';
     if (desc.includes('ataque') || desc.includes('posicional') || desc.includes('ofensiv')) return 'Ataque posicional';
     if (desc.includes('defesa') || desc.includes('defensiv') || desc.includes('bloqueio')) return 'Defesa';
-    if (desc.includes('transiç') || desc.includes('recuperação')) return 'Transição';
+    if (desc.includes('transiÃ§') || desc.includes('recuperaÃ§Ã£o')) return 'TransiÃ§Ã£o';
     if (desc.includes('bola parada') || desc.includes('livre') || desc.includes('7 metros')) return 'Bola parada';
-    if (desc.includes('técnica') || desc.includes('finta') || desc.includes('remate')) return 'Técnica individual';
+    if (desc.includes('tÃ©cnica') || desc.includes('finta') || desc.includes('remate')) return 'TÃ©cnica individual';
 
-    return 'Técnica individual'; // Fallback padrão seguro
+    return 'TÃ©cnica individual'; // Fallback padrÃ£o seguro
   },
 
   async getById(id: string): Promise<PlayDisplay | null> {
@@ -362,11 +382,11 @@ export const playsAPI = {
   },
 
   async create(playData: Omit<PlayDisplay, 'id' | 'criadoEm' | 'comentarios'>, videoFile?: File): Promise<PlayDisplay> {
-    console.log('🎯 [CREATE PLAY] Iniciando criação...');
+    console.log('ðŸŽ¯ [CREATE PLAY] Iniciando criaÃ§Ã£o...');
 
     const currentUser = authAPI.getCurrentUser();
     if (!currentUser) {
-      throw new Error('Utilizador não autenticado');
+      throw new Error('Utilizador nÃ£o autenticado');
     }
 
     const equipasResponse = await apiCall('/equipas');
@@ -384,30 +404,30 @@ export const playsAPI = {
 
     const equipaId = equipa?.id || equipas[0]?.id || 17;
 
-    // ✅ CRIAR FORMDATA PARA UPLOAD DE FICHEIROS
+    // âœ… CRIAR FORMDATA PARA UPLOAD DE FICHEIROS
     const formData = new FormData();
     formData.append('user_id', currentUser.id.toString());
     formData.append('equipa_id', equipaId.toString());
     formData.append('titulo', playData.titulo);
     formData.append('descricao', playData.descricao);
-    formData.append('categoria', playData.categoria); // ✅ ENVIAR CATEGORIA
+    formData.append('categoria', playData.categoria); // âœ… ENVIAR CATEGORIA
 
     if (videoFile) {
       formData.append('video', videoFile);
-      console.log('📹 [CREATE PLAY] Vídeo anexado:', videoFile.name);
+      console.log('ðŸ“¹ [CREATE PLAY] VÃ­deo anexado:', videoFile.name);
     } else if (playData.urlVideo) {
       formData.append('ficheiro', playData.urlVideo);
     }
 
-    console.log('📤 [CREATE PLAY] Enviando FormData...');
+    console.log('ðŸ“¤ [CREATE PLAY] Enviando FormData...');
 
-    // ✅ ENVIAR COM FORMDATA (SEM JSON)
+    // âœ… ENVIAR COM FORMDATA (SEM JSON)
     const response = await fetch(`${API_BASE_URL}/jogadas`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('api_token')}`
-        // NÃO incluir Content-Type para FormData
+        // NÃƒO incluir Content-Type para FormData
       },
       body: formData,
       credentials: 'include'
@@ -418,7 +438,7 @@ export const playsAPI = {
     }
 
     const result = await response.json();
-    console.log('✅ [CREATE PLAY] Jogada criada:', result.data);
+    console.log('âœ… [CREATE PLAY] Jogada criada:', result.data);
 
     return {
       ...playData,
@@ -430,11 +450,11 @@ export const playsAPI = {
   },
 
   async addComment(jogadaId: string, comentario: Omit<CommentDisplay, 'id' | 'criadoEm'>): Promise<CommentDisplay> {
-    console.log('💬 [ADD COMMENT] Adicionando comentário à jogada:', jogadaId);
+    console.log('ðŸ’¬ [ADD COMMENT] Adicionando comentÃ¡rio Ã  jogada:', jogadaId);
 
     const currentUser = authAPI.getCurrentUser();
     if (!currentUser) {
-      throw new Error('Utilizador não autenticado');
+      throw new Error('Utilizador nÃ£o autenticado');
     }
 
     try {
@@ -447,7 +467,7 @@ export const playsAPI = {
         }),
       });
 
-      console.log('✅ [ADD COMMENT] Comentário criado na BD:', response.data);
+      console.log('âœ… [ADD COMMENT] ComentÃ¡rio criado na BD:', response.data);
 
       return {
         id: response.data.id.toString(),
@@ -460,17 +480,17 @@ export const playsAPI = {
       };
 
     } catch (error) {
-      console.error('❌ [ADD COMMENT] Erro ao criar comentário:', error);
+      console.error('âŒ [ADD COMMENT] Erro ao criar comentÃ¡rio:', error);
       throw error;
     }
   },
 
   async update(playId: string, playData: Partial<PlayDisplay>, videoFile?: File): Promise<PlayDisplay> {
-    console.log('🔄 [UPDATE PLAY] A atualizar jogada:', playId);
+    console.log('ðŸ”„ [UPDATE PLAY] A atualizar jogada:', playId);
 
     const currentUser = authAPI.getCurrentUser();
     if (!currentUser) {
-      throw new Error('Utilizador não autenticado');
+      throw new Error('Utilizador nÃ£o autenticado');
     }
 
     const formData = new FormData();
@@ -478,16 +498,23 @@ export const playsAPI = {
 
     if (playData.titulo) formData.append('titulo', playData.titulo);
     if (playData.descricao) formData.append('descricao', playData.descricao);
-    if (playData.categoria) formData.append('categoria', playData.categoria); // ✅ ENVIAR CATEGORIA
+    if (playData.categoria) formData.append('categoria', playData.categoria); // âœ… ENVIAR CATEGORIA
+
+    // Tentar manter a equipa original se nÃ£o for passada
+    if (playData.equipa) {
+      // Aqui terÃ­amos de buscar o ID da equipa novamente se for string
+      // Por simplificaÃ§Ã£o, assumimos que quem edita nÃ£o muda a equipa por enquanto 
+      // ou a API backend trata disso
+    }
 
     if (videoFile) {
       formData.append('video', videoFile);
-      console.log('📹 [UPDATE PLAY] Novo vídeo anexado:', videoFile.name);
+      console.log('ðŸ“¹ [UPDATE PLAY] Novo vÃ­deo anexado:', videoFile.name);
     } else if (playData.urlVideo) {
       formData.append('ficheiro', playData.urlVideo);
     }
 
-    console.log('📤 [UPDATE PLAY] Enviando dados...');
+    console.log('ðŸ“¤ [UPDATE PLAY] Enviando dados...');
 
     try {
       const response = await fetch(`${API_BASE_URL}/jogadas/${playId}`, {
@@ -501,15 +528,16 @@ export const playsAPI = {
       });
 
       if (!response.ok) {
-        throw new Error(`Erro na atualização: ${response.status}`);
+        throw new Error(`Erro na atualizaÃ§Ã£o: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log('✅ [UPDATE PLAY] Jogada atualizada:', result.data);
+      console.log('âœ… [UPDATE PLAY] Jogada atualizada:', result.data);
 
       return {
         ...playData,
         id: playId,
+        // Manter dados antigos se nÃ£o vierem no update (simplificaÃ§Ã£o)
         titulo: playData.titulo || '',
         descricao: playData.descricao || '',
         urlVideo: result.data.ficheiro || playData.urlVideo,
@@ -519,25 +547,29 @@ export const playsAPI = {
         equipa: currentUser.equipa || '',
         categoria: playData.categoria || this.determinarCategoria(playData.descricao || ''),
         criadoEm: new Date(),
-        comentarios: []
+        comentarios: [] // NÃ£o precisamos dos comentÃ¡rios para o retorno do update
       } as PlayDisplay;
 
     } catch (error: any) {
-      console.error('❌ [UPDATE PLAY] Erro ao atualizar jogada:', error);
+      console.error('âŒ [UPDATE PLAY] Erro ao atualizar jogada:', error);
       throw error;
     }
   },
 
+  // âœ… MÃ‰TODO DELETE ADICIONADO
   async delete(playId: string): Promise<void> {
-    console.log('🗑️ [DELETE PLAY] A apagar jogada:', playId);
+    console.log('ðŸ—‘ï¸ [DELETE PLAY] A apagar jogada:', playId);
+
+    const currentUser = authAPI.getCurrentUser();
 
     try {
-      await apiCall(`/jogadas/${playId}`, {
+      const response = await apiCall(`/jogadas/${playId}`, {
         method: 'DELETE',
       });
-      console.log('✅ [DELETE PLAY] Jogada apagada com sucesso');
+
+      console.log('âœ… [DELETE PLAY] Jogada apagada com sucesso');
     } catch (error: any) {
-      console.error('❌ [DELETE PLAY] Erro ao apagar jogada:', error);
+      console.error('âŒ [DELETE PLAY] Erro ao apagar jogada:', error);
       throw error;
     }
   }
@@ -546,15 +578,18 @@ export const playsAPI = {
 // Tips API
 export const tipsAPI = {
   async getAll(): Promise<TipDisplay[]> {
-    console.log('🔄 [TIPS API DEBUG] Buscando dicas...');
+    console.log('ðŸ”„ [TIPS API DEBUG] Buscando dicas...');
     const response = await apiCall('/dicas');
 
+    // âœ… BUSCAR USERS PARA TER DADOS REAIS
     const usersResponse = await apiCall('/users').catch(() => ({ data: [] }));
     const users = usersResponse.data || [];
 
     const dicasProcessadas = response.data.map((dica: any) => {
+      // âœ… ENCONTRAR O USER REAL
       const autorReal = users.find((u: any) => u.id === dica.user_id);
 
+      // âœ… USAR DADOS REAIS
       const autorNome = autorReal?.nome || dica.user?.nome || 'Utilizador';
       const autorTipo = mapUserType(autorReal?.tipo || dica.user?.tipo) || 'atleta';
 
@@ -562,7 +597,7 @@ export const tipsAPI = {
         id: dica.id.toString(),
         titulo: dica.titulo,
         descricao: dica.conteudo.substring(0, 100) + '...',
-        categoria: dica.categoria || 'táctica',
+        categoria: dica.categoria || 'tÃ¡ctica',
         conteudo: dica.conteudo,
         autorId: dica.user_id?.toString() || '1',
         autorNome: autorNome,
@@ -581,11 +616,23 @@ export const tipsAPI = {
   },
 
   async create(dicaData: Omit<TipDisplay, 'id' | 'criadoEm'>): Promise<TipDisplay> {
+    console.log('ðŸŽ¯ [DEBUG API CREATE] INICIANDO CRIAÃ‡ÃƒO DE DICA');
+    console.log('ðŸ“¥ Dados recebidos do Frontend:', {
+      titulo: dicaData.titulo,
+      categoria: dicaData.categoria,
+      autorId: dicaData.autorId,
+      autorNome: dicaData.autorNome,
+      autorTipo: dicaData.autorTipo
+    });
+
     const user_id = dicaData.autorId;
 
     if (!user_id) {
-      throw new Error('Utilizador não identificado');
+      console.error('âŒ ERRO: Nenhum user ID recebido do frontend!');
+      throw new Error('Utilizador nÃ£o identificado');
     }
+
+    console.log('ðŸŽ¯ User ID a usar:', user_id);
 
     const newDicaData = {
       user_id: parseInt(user_id.toString()),
@@ -595,10 +642,14 @@ export const tipsAPI = {
       ficheiro: null
     };
 
+    console.log('ðŸ“¤ [DEBUG API] Dados FINAIS para Laravel:', newDicaData);
+
     const response = await apiCall('/dicas', {
       method: 'POST',
       body: JSON.stringify(newDicaData),
     });
+
+    console.log('âœ… [DEBUG API] Resposta do Laravel:', response.data);
 
     return {
       ...dicaData,
@@ -607,9 +658,11 @@ export const tipsAPI = {
     };
   },
   async update(tipId: string, tipData: Partial<TipDisplay>): Promise<TipDisplay> {
+    console.log('ðŸ”„ [UPDATE TIP] A atualizar dica:', tipId);
+
     const currentUser = authAPI.getCurrentUser();
     if (!currentUser) {
-      throw new Error('Utilizador não autenticado');
+      throw new Error('Utilizador nÃ£o autenticado');
     }
 
     try {
@@ -623,11 +676,13 @@ export const tipsAPI = {
         }),
       });
 
+      console.log('âœ… [UPDATE TIP] Dica atualizada:', response.data);
+
       return {
         ...tipData,
         id: tipId,
         titulo: response.data.titulo,
-        descricao: response.data.descricao,
+        descricao: response.data.descricao,  // Assuming backend returns this
         categoria: response.data.categoria,
         conteudo: response.data.conteudo,
         autorId: response.data.user_id.toString(),
@@ -638,19 +693,21 @@ export const tipsAPI = {
       } as TipDisplay;
 
     } catch (error: any) {
-      console.error('❌ [UPDATE TIP] Erro ao atualizar dica:', error);
+      console.error('âŒ [UPDATE TIP] Erro ao atualizar dica:', error);
       throw error;
     }
   },
 
   async delete(tipId: string | number): Promise<void> {
+    console.log('ðŸ—‘ï¸ [DELETE TIP] A apagar dica:', tipId);
+
     try {
       await apiCall(`/dicas/${tipId}`, {
         method: 'DELETE',
       });
-      console.log('✅ [DELETE TIP] Dica apagada com sucesso');
+      console.log('âœ… [DELETE TIP] Dica apagada com sucesso');
     } catch (error: any) {
-      console.error('❌ [DELETE TIP] Erro ao apagar dica:', error);
+      console.error('âŒ [DELETE TIP] Erro ao apagar dica:', error);
       throw error;
     }
   }
@@ -684,7 +741,9 @@ export const teamStatsAPI = {
 };
 
 // Athlete Stats API
+// Athlete Stats API
 export const athleteStatsAPI = {
+  // âœ… Obter estatÃ­sticas pÃºblicas (para leaderboards)
   async getAll(): Promise<AthleteStatsDisplay[]> {
     try {
       const response = await apiCall('/estatisticas-atletas');
@@ -705,7 +764,7 @@ export const athleteStatsAPI = {
       }));
 
     } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
+      console.error('Erro ao carregar estatÃ­sticas:', error);
       return [];
     }
   },
@@ -715,11 +774,13 @@ export const athleteStatsAPI = {
     return stats.filter((stat: AthleteStatsDisplay) => stat.divisao === divisao);
   },
 
+  // âœ… Obter estatÃ­sticas do MEU atleta (Dashboard)
   async getMyStats(): Promise<any> {
     const response = await apiCall('/estatisticas-atleta');
     return response;
   },
 
+  // âœ… Adicionar jogo (Dashboard)
   async addGame(payload: any): Promise<any> {
     const response = await apiCall('/estatisticas-atleta', {
       method: 'POST',
@@ -728,10 +789,12 @@ export const athleteStatsAPI = {
     return response;
   },
 
+  // âœ… Obter estatÃ­sticas pÃºblicas (para Tabelas/Rankings)
   async getPublicStats(): Promise<any> {
     return apiCall('/estatisticas-atletas');
   }
 };
+
 
 // Trainers API
 export const trainersAPI = {
@@ -740,7 +803,7 @@ export const trainersAPI = {
       const response = await apiCall('/treinador/atletas-pendentes');
       return response.data || [];
     } catch (error) {
-      console.error('❌ [TRAINERS API] Erro a buscar atletas pendentes', error);
+      console.error('âŒ [TRAINERS API] Erro a buscar atletas pendentes', error);
       return [];
     }
   },
@@ -765,7 +828,7 @@ export const adminAPI = {
       const response = await apiCall('/admin/pending-treinadores');
       return response.data || [];
     } catch (error) {
-      console.error('❌ [ADMIN API] Erro a buscar treinadores pendentes', error);
+      console.error('âŒ [ADMIN API] Erro a buscar treinadores pendentes', error);
       return [];
     }
   },
@@ -775,7 +838,7 @@ export const adminAPI = {
       const response = await apiCall('/admin/pending-athletes');
       return response.data || [];
     } catch (error) {
-      console.error('❌ [ADMIN API] Erro a buscar atletas pendentes', error);
+      console.error('âŒ [ADMIN API] Erro a buscar atletas pendentes', error);
       return [];
     }
   },
@@ -785,7 +848,7 @@ export const adminAPI = {
       const response = await apiCall('/admin/users');
       return response.data || [];
     } catch (error) {
-      console.error('❌ [ADMIN API] Erro a buscar utilizadores', error);
+      console.error('âŒ [ADMIN API] Erro a buscar utilizadores', error);
       return [];
     }
   },
@@ -795,7 +858,7 @@ export const adminAPI = {
       const response = await apiCall('/admin/stats');
       return response.data;
     } catch (error) {
-      console.error('❌ [ADMIN API] Erro ao buscar estatísticas globais', error);
+      console.error('âŒ [ADMIN API] Erro ao buscar estatÃ­sticas globais', error);
       return null;
     }
   },
@@ -850,7 +913,7 @@ export const equipasAPI = {
       const response = await apiCall('/equipas');
       return response.data || [];
     } catch (error) {
-      console.error('❌ [EQUIPAS API] Erro ao buscar equipas', error);
+      console.error('âŒ [EQUIPAS API] Erro ao buscar equipas', error);
       return [];
     }
   },
@@ -873,14 +936,14 @@ export const equipasAPI = {
   }
 };
 
-// Escalões API
+// EscalÃµes API
 export const escaloesAPI = {
   async getAll(): Promise<any[]> {
     try {
       const response = await apiCall('/escaloes');
       return response.data || [];
     } catch (error) {
-      console.error('❌ [ESCALÕES API] Erro ao buscar escalões', error);
+      console.error('âŒ [ESCALÃ•ES API] Erro ao buscar escalÃµes', error);
       return [];
     }
   }
@@ -890,10 +953,10 @@ export const escaloesAPI = {
 export const testAPIConnection = async () => {
   try {
     const response = await apiCall('/test');
-    console.log('✅ Conexão com API Laravel estabelecida:', response);
+    console.log('âœ… ConexÃ£o com API Laravel estabelecida:', response);
     return response;
   } catch (error) {
-    console.error('❌ Erro na conexão com API Laravel:', error);
+    console.error('âŒ Erro na conexÃ£o com API Laravel:', error);
     throw error;
   }
 };
