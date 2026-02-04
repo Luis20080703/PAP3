@@ -80,10 +80,11 @@ export function TeamStatsSection() {
 
   return (
     <div className="space-y-6">
+      <br />
       <div>
         <h2>Estatísticas de Equipas</h2>
         <p className="text-gray-600">
-          🎮 Descobre como a tua equipa está a arrasar! 🎮
+          Descobre como a tua equipa está a arrasar!
         </p>
       </div>
 

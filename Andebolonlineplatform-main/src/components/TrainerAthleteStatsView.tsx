@@ -53,6 +53,14 @@ export function TrainerAthleteStatsView() {
     }
   }
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter athletes based on search query
+  const filteredAtletas = atletasList.filter(atleta =>
+    atleta.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    atleta.equipa.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (selectedAtleta) {
     return (
       <div className="p-4 max-w-xl mx-auto space-y-6">
@@ -101,25 +109,72 @@ export function TrainerAthleteStatsView() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto space-y-6">
-      <div className="text-center">
+    <div className="space-y-6">
+      <div>
         <h2 className="text-2xl font-bold">Estatísticas dos Atletas</h2>
-        <p className="text-gray-500">Lista de atletas com estatísticas registadas</p>
+        <p className="text-gray-500">
+          Lista de atletas com estatísticas registadas
+        </p>
       </div>
 
+      {/* Search Bar - Custom Twitter Style */}
+      <form className="twitter-search-form" onSubmit={(e) => e.preventDefault()}>
+        <label className="twitter-search-label" htmlFor="search">
+          <input
+            className="twitter-search-input"
+            type="text"
+            required
+            placeholder="Pesquisar atleta..."
+            id="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="twitter-search-fancy-bg"></div>
+          <div className="twitter-search-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <g>
+                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-3.365-7.5-7.5-7.5z"></path>
+              </g>
+            </svg>
+          </div>
+          <button
+            className="twitter-search-close-btn"
+            type="button"
+            onClick={() => setSearchQuery('')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+            </svg>
+          </button>
+        </label>
+      </form>
+
       {loading ? (
-        <div className="flex justify-center py-20">
+        <div className="flex justify-center items-center py-12">
           <LoadingWave />
         </div>
-      ) : atletasList.length === 0 ? (
-        <Card className="p-6 text-center">
-          <CardContent>
-            <p className="text-gray-500">Nenhum atleta com estatísticas encontrado</p>
-          </CardContent>
-        </Card>
+      ) : filteredAtletas.length === 0 ? (
+        <div className="text-center py-12">
+          {searchQuery ? (
+            <>
+              <h3 className="text-gray-500 mb-2">Nenhum atleta encontrado</h3>
+              <p className="text-gray-400">Tente pesquisar por outro nome</p>
+            </>
+          ) : (
+            <h3 className="text-gray-500">Ainda não há estatísticas registadas</h3>
+          )}
+        </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-8">
-          {atletasList.map((atleta: AtletaStats) => (
+        <div
+          className="grid w-full"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+            columnGap: '2.5rem',
+            rowGap: '3.5rem',
+            justifyItems: 'start'
+          }}
+        >
+          {filteredAtletas.map((atleta: AtletaStats) => (
             <div key={atleta.id} className="play-tip-card">
               <div className="play-tip-content">
                 <div className="flex flex-col w-full h-full justify-between gap-4">
@@ -145,13 +200,13 @@ export function TrainerAthleteStatsView() {
                     </div>
                   </div>
 
-                  <Button
+                  <button
+                    className="btn-details w-full mt-2"
                     onClick={() => setSelectedAtleta(atleta)}
-                    className="w-full bg-transparent border-white/40 text-white hover:bg-white/20 group font-semibold shadow-none mt-2"
                   >
-                    <Eye className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                    Ver Detalhes
-                  </Button>
+                    <Eye className="w-4 h-4 mr-2" />
+                    VER DETALHES
+                  </button>
                 </div>
               </div>
             </div>

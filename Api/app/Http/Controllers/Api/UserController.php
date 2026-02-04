@@ -39,7 +39,23 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6',
             'tipo' => 'required|in:atleta,treinador',
-            'equipa' => 'required|string'
+            'equipa' => 'required|string',
+            'cipa' => [
+                'nullable',
+                'integer',
+                'digits:6',
+                'unique:atletas,cipa',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('tipo') === 'atleta' && empty($value)) {
+                        $fail('O número CIPA é obrigatório para atletas.');
+                    }
+                },
+            ],
+        ], [
+            'email.unique' => 'Este e-mail já está em uso.',
+            'cipa.unique' => 'Este número CIPA já está registado na base de dados.',
+            'cipa.digits' => 'O número CIPA deve ter exatamente 6 dígitos.',
+            'cipa.integer' => 'O CIPA deve ser um número inteiro.',
         ]);
 
         Log::info('✅ [STORE] Validated data', ['validated' => $validated]);
@@ -70,7 +86,8 @@ class UserController extends Controller
                 'epoca_id' => $epoca->id,
                 'posicao' => $request->input('posicao', 'Central'),
                 'numero' => $request->input('numero', 0),
-                'escalao' => $request->input('escalao')
+                'escalao' => $request->input('escalao'),
+                'cipa' => $request->input('cipa') // ✅ Save CIPA
             ]);
         } elseif ($validated['tipo'] === 'treinador') {
             \App\Models\Treinador::create([
@@ -203,7 +220,7 @@ class UserController extends Controller
         // VALIDAÇÃO 3: Conta não validada (Treinadores E Atletas)
         if (($user->tipo === 'treinador' || $user->tipo === 'atleta') && !$user->validado) {
              throw new AccountNotValidatedException(
-                 "Sua conta aguarda aprovação " . ($user->tipo === 'atleta' ? "do treinador." : "do administrador."),
+                 "A sua conta aguarda aprovação " . ($user->tipo === 'atleta' ? "do treinador." : "do administrador."),
                  403,
                  ['user_id' => $user->id]
              );

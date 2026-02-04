@@ -20,7 +20,7 @@ interface AppContextType {
 
   // Actions
   setUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<User | null>;
+  login: (email: string, password: string, cipa?: string) => Promise<User | null>;
   register: (userData: Omit<User, 'id'>) => Promise<void>;
   logout: () => Promise<void>;
 
@@ -117,7 +117,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const login = async (email: string, password: string): Promise<User | null> => {
+  const login = async (email: string, password: string, cipa?: string): Promise<User | null> => {
     console.log('🔐 Iniciando login para:', email);
 
     if (!email || !email.includes('@')) {
@@ -132,7 +132,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     try {
       console.log('⏳ A tentar autenticar...');
-      const loggedUser = await authAPI.login(email, password);
+      const loggedUser = await authAPI.login(email, password, cipa);
 
       if (!loggedUser || !loggedUser.id) {
         console.error('❌ Utilizador retornado inválido:', loggedUser);

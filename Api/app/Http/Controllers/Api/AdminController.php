@@ -329,6 +329,31 @@ class AdminController extends Controller
     }
 
     /**
+     * Alterna o estado de validação de um utilizador.
+     */
+    public function toggleValidation($id)
+    {
+        $this->authorizeAdmin();
+        $user = User::findOrFail($id);
+        $user->validado = !$user->validado;
+        $user->save();
+
+        if ($user->tipo === 'treinador') {
+            $treinador = Treinador::where('user_id', $user->id)->first();
+            if ($treinador) {
+                $treinador->validado = $user->validado;
+                $treinador->save();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $user->validado ? 'Utilizador ativado' : 'Utilizador desativado',
+            'data' => ['validado' => $user->validado]
+        ]);
+    }
+
+    /**
      * Endpoint para dados iniciais do dashboard admin (contagens, etc.).
      */
     public function dashboard()

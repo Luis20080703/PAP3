@@ -159,15 +159,17 @@ export function TipsSection() {
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
+          <br />
           <h2 className="text-2xl font-bold tracking-tight">Dicas Técnicas</h2>
           <p className="text-gray-600">Aprenda e partilhe técnicas e conhecimentos</p>
         </div>
         {user.tipo !== 'admin' && user.tipo !== 'root' && (
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="btn-create-play w-full sm:w-auto h-auto">
-                <Plus className="w-5 h-5 mr-3" />
-                Nova Dica
+              <Button className="btn-create-play w-auto h-auto py-2 sm:py-2.5 px-4 sm:px-6 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-xs sm:text-base">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Nova Dica</span>
+                <span className="sm:hidden">Nova</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -196,7 +198,7 @@ export function TipsSection() {
                         <SelectItem value="drible">Dribles</SelectItem>
                         <SelectItem value="remate">Remates</SelectItem>
                         <SelectItem value="defesa">Defesa</SelectItem>
-                        <SelectItem value="táctica">Tácticas</SelectItem>
+                        <SelectItem value="táctica">Táticas</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -240,7 +242,7 @@ export function TipsSection() {
             { id: 'drible', label: 'Dribles', icon: MoveHorizontal },
             { id: 'remate', label: 'Remates', icon: Target },
             { id: 'defesa', label: 'Defesa', icon: Shield },
-            { id: 'táctica', label: 'Tácticas', icon: MapIcon },
+            { id: 'táctica', label: 'Táticas', icon: MapIcon },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -263,7 +265,15 @@ export function TipsSection() {
           {dicasCarregando ? (
             <div className="flex justify-center py-12"><LoadingWave /></div>
           ) : (
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+            <div
+              className="grid w-full"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                columnGap: '2.5rem',
+                rowGap: '3.5rem',
+                justifyItems: 'start'
+              }}
+            >
               {filteredTips.map((tip: TipDisplay) => (
                 <div key={tip.id} className="play-tip-card">
                   <div className="play-tip-content">
@@ -307,8 +317,8 @@ export function TipsSection() {
 
                     <Dialog>
                       <DialogTrigger asChild>
-                        <button className="btn-details w-full group">
-                          <BookOpen className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                        <button className="btn-details w-full mt-2">
+                          <BookOpen className="w-4 h-4 mr-2" />
                           Ver Detalhes
                         </button>
                       </DialogTrigger>

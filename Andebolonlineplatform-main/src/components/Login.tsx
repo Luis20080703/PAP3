@@ -42,6 +42,7 @@ export function Login({ onBack }: LoginProps) {
   const [posicao, setPosicao] = useState('');
   const [numero, setNumero] = useState('');
   const [escalao, setEscalao] = useState('');
+  const [registerCipa, setRegisterCipa] = useState(''); // New state for registration
   const [escaloes, setEscaloes] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('login');
 
@@ -77,11 +78,8 @@ export function Login({ onBack }: LoginProps) {
     try {
       await login(loginEmail, loginPassword);
 
-      // (a navegação para a dashboard ou página de aprovação é feita por quem controla a rota/estado global)
       toast.success('Login efetuado com sucesso!');
-      // (a navegação para a dashboard é feita por quem controla a rota/estado global)
     } catch (error) {
-      // Se a API retornar 403 Forbidden com mensagem específica, tentamos mostrar
       toast.error(error instanceof Error ? error.message : 'Erro ao fazer login');
     } finally {
       setIsLoading(false);
@@ -97,7 +95,7 @@ export function Login({ onBack }: LoginProps) {
       return;
     }
 
-    const registerData: RegisterData = {
+    const registerData: RegisterData & { cipa?: string } = {
       nome: registerNome,
       email: registerEmail,
       password: registerPassword,
@@ -107,13 +105,18 @@ export function Login({ onBack }: LoginProps) {
     };
 
     if (userType === 'atleta') {
-      if (!posicao || !numero || !escalao) {
-        toast.error('Preencha posição, número e escalão para atletas');
+      if (!posicao || !numero || !escalao || !registerCipa) {
+        toast.error('Preencha posição, número, escalão e CIPA para atletas');
+        return;
+      }
+      if (registerCipa.length !== 6) {
+        toast.error('O número CIPA deve ter 6 dígitos.');
         return;
       }
       registerData.posicao = posicao;
       registerData.numero = numero;
       registerData.escalao = escalao;
+      registerData.cipa = registerCipa;
       registerData.validado = false; // ✅ Atleta também precisa de validação
     } else if (userType === 'treinador') {
       if (!escalao) {
@@ -235,9 +238,6 @@ export function Login({ onBack }: LoginProps) {
                   ) : 'Entrar no jogo'}
                 </button>
               </form>
-
-
-
             </TabsContent>
 
             <TabsContent value="register">
@@ -305,6 +305,7 @@ export function Login({ onBack }: LoginProps) {
                       if (value === 'treinador') {
                         setPosicao('');
                         setNumero('');
+                        setRegisterCipa('');
                       }
                     }}
                     className="flex gap-4"
@@ -344,6 +345,17 @@ export function Login({ onBack }: LoginProps) {
                       className="login-input"
                       min="1"
                       max="99"
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="Nº CIPA (6 dígitos)"
+                      value={registerCipa}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        if (val.length <= 6) setRegisterCipa(val);
+                      }}
+                      className="login-input"
                       required
                     />
                   </>

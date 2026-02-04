@@ -17,7 +17,7 @@ class AccountNotValidatedException extends Exception
      * @param array $context Contexto adicional para debug
      */
     public function __construct(
-        string $message = "Sua conta ainda não foi validada pelo administrador.", 
+        string $message = "A sua conta ainda não foi validada pelo administrador.", 
         int $httpStatusCode = 403, 
         array $context = []
     ) {

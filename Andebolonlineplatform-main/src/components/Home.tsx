@@ -28,20 +28,39 @@ export function Home({ onNavigateToLogin }: HomeProps) {
   return (
     <div className="min-h-screen w-full">
       {/* Header */}
-      <header className="bg-blue-600 text-white py-4 md:py-6 px-4 md:px-8 shadow-lg">
-        <div className="w-full max-w-[1920px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="NexusHand Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain" />
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold animate-text-shine">NexusHand</h1>
+      <header
+        className="fixed top-0 left-0 right-0 w-full z-50 pt-[calc(0.5rem+var(--safe-area-inset-top,0px))] pb-2 md:py-6 px-4 md:px-8 transition-all duration-500"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+          backdropFilter: 'blur(40px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(200%)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          zIndex: 99999,
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.07)'
+        }}
+      >
+        <div className="w-full max-w-[1920px] mx-auto flex items-center justify-between relative z-10">
+          <div
+            className="flex items-center gap-3 cursor-pointer group"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            <img src="/logo.png" alt="NexusHand Logo" className="w-12 h-12 md:w-24 md:h-24 object-contain transition-transform duration-300 group-hover:scale-110" />
+            <h1 className="hidden sm:block text-sm md:text-2xl font-bold bg-gradient-to-r from-blue-700 via-blue-500 to-blue-700 bg-clip-text text-transparent bg-[length:200%_auto] animate-text-shine">
+              NexusHand
+            </h1>
           </div>
-          <span className="text-white text-lg lg:text-xl font-medium" style={{ fontStyle: 'italic' }}>
+          <div
+            className="text-sm md:text-2xl font-black italic whitespace-nowrap"
+            style={{ color: '#2563eb', opacity: 1, position: 'relative', zIndex: 101 }}
+          >
             Andebol mais que um desporto
-          </span>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative text-white py-12 md:py-20 lg:py-32 px-4 overflow-hidden min-h-[60vh] flex items-center justify-center">
+      <section className="relative z-0 text-white py-12 md:py-32 lg:py-48 px-4 overflow-hidden min-h-[80vh] flex flex-col items-center">
         {/* Background Gallery */}
         {images.map((image, index) => (
           <div
@@ -56,14 +75,16 @@ export function Home({ onNavigateToLogin }: HomeProps) {
         ))}
         <div className="absolute inset-0 z-0 bg-blue-950/50" />
 
+        {/* Mobile Spacer to ensure title doesn't clash with fixed header */}
+        <div className="h-60 md:hidden flex-shrink-0"></div>
 
         <div className="relative z-10 w-full max-w-[1920px] mx-auto text-center px-4">
           <div className="mb-6">
-            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl 2xl:text-9xl tracking-tight mb-8 animate-text-shine font-black">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl 2xl:text-9xl tracking-tight mb-6 animate-text-shine font-black">
               NexusHand
             </h2>
           </div>
-          <p className="font-semibold cursive text-lg md:text-xl lg:text-2xl 2xl:text-3xl mb-10 md:mb-16 max-w-4xl mx-auto text-white dark:text-gray-100 drop-shadow-md">
+          <p className="font-semibold cursive text-base md:text-xl lg:text-2xl 2xl:text-3xl mb-8 md:mb-16 max-w-4xl mx-auto text-white dark:text-gray-100 drop-shadow-md">
             A plataforma dedicada a atletas e treinadores de andebol para partilha de jogadas,
             dicas técnicas e estatísticas de equipas e atletas.
           </p>
@@ -134,26 +155,32 @@ export function Home({ onNavigateToLogin }: HomeProps) {
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl">História do Andebol</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 text-lg text-gray-700 text-center">
+                <CardContent className="space-y-8 text-lg text-gray-700 max-w-3xl mx-auto text-left py-10">
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Origem</h3>
-                    <p>
-                      O andebol foi criado em 1919 pelo professor alemão Karl Schelenz,
+                    <h3 className="font-bold text-blue-600 text-xl mb-3 flex items-center gap-2">
+                      Origem
+                    </h3>
+                    <p className="leading-relaxed">
+                      O andebol foi criado em 1919 pelo professor alemão <span className="font-semibold text-gray-900">Karl Schelenz</span>,
                       na cidade de Berlim. Inicialmente, era jogado em campos abertos
                       com 11 jogadores por equipa.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Evolução</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3 flex items-center gap-2">
+                      Evolução
+                    </h3>
+                    <p className="leading-relaxed">
                       Em 1936, o andebol de campo foi incluído nos Jogos Olímpicos de Berlim.
                       A versão de pavilhão (7 jogadores) tornou-se mais popular a partir de 1950
                       e é a modalidade praticada atualmente.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Desenvolvimento Internacional</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3 flex items-center gap-2">
+                      Desenvolvimento Internacional
+                    </h3>
+                    <p className="leading-relaxed">
                       A Federação Internacional de Andebol (IHF) foi fundada em 1946.
                       O andebol de pavilhão entrou nos Jogos Olímpicos em 1972 (masculino)
                       e 1976 (feminino).
@@ -168,38 +195,38 @@ export function Home({ onNavigateToLogin }: HomeProps) {
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl">Regras Principais do Andebol</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 text-lg text-gray-700 text-center">
+                <CardContent className="space-y-8 text-lg text-gray-700 max-w-3xl mx-auto text-left py-10">
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Equipas</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Equipas</h3>
+                    <p className="leading-relaxed">
                       Cada equipa tem 7 jogadores em campo (6 jogadores de campo + 1 guarda-redes).
                       São permitidos até 7 suplentes.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Duração do Jogo</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Duração do Jogo</h3>
+                    <p className="leading-relaxed">
                       O jogo tem 2 partes de 30 minutos cada (seniores), com 10 minutos de intervalo.
                       Para escalões jovens, a duração é reduzida.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Passos e Bola</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Passos e Bola</h3>
+                    <p className="leading-relaxed">
                       O jogador pode dar no máximo 3 passos com a bola e mantê-la por 3 segundos.
                       Pode driblar, parar e voltar a driblar.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Área de Baliza</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Área de Baliza</h3>
+                    <p className="leading-relaxed">
                       Apenas o guarda-redes pode entrar na área de baliza (6 metros).
                       Os jogadores podem saltar de fora e rematar no ar.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Penalizações</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Penalizações</h3>
+                    <p className="leading-relaxed">
                       Cartão amarelo (advertência), 2 minutos de exclusão,
                       cartão vermelho (desqualificação) e cartão azul (expulsão com relatório).
                     </p>
@@ -213,38 +240,38 @@ export function Home({ onNavigateToLogin }: HomeProps) {
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl">Curiosidades sobre o Andebol</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 text-lg text-gray-700 text-center">
+                <CardContent className="space-y-8 text-lg text-gray-700 max-w-3xl mx-auto text-left py-10">
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Velocidade da Bola</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Velocidade da Bola</h3>
+                    <p className="leading-relaxed">
                       Um remate de um jogador profissional pode atingir velocidades
                       superiores a 130 km/h!
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Popularidade</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Popularidade</h3>
+                    <p className="leading-relaxed">
                       O andebol é o segundo desporto coletivo mais popular na Europa,
                       perdendo apenas para o futebol.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Campeões</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Campeões</h3>
+                    <p className="leading-relaxed">
                       A França é a seleção mais bem-sucedida do mundo, com múltiplos
                       títulos mundiais e olímpicos.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Em Portugal</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Em Portugal</h3>
+                    <p className="leading-relaxed">
                       O andebol em Portugal tem crescido significativamente,
                       com várias equipas a competir em competições europeias.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Recordes</h3>
-                    <p>
+                    <h3 className="font-bold text-blue-600 text-xl mb-3">Recordes</h3>
+                    <p className="leading-relaxed">
                       O maior número de golos num jogo profissional foi 320
                       (Dinamarca vs Kuwait, 166-154, em 1982).
                     </p>

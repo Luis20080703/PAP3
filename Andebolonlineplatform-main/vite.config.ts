@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 export default defineConfig({
+  base: './', // ✅ Caminhos relativos para evitar erros no ngrok
   plugins: [
     react(),
     VitePWA({
@@ -117,5 +118,18 @@ export default defineConfig({
     host: '0.0.0.0', // ✅ Permite acesso da rede local (telemóveis)
     port: 3000,
     open: true,
+    allowedHosts: true, // ✅ Permitir acesso via ngrok
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/storage': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   },
 });

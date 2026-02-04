@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, BookOpen, TrendingUp, Users } from 'lucide-react';
+import { Upload, BookOpen, TrendingUp, Users, Trophy } from 'lucide-react';
 
 interface DockMenuProps {
     activeTab: string;
@@ -16,6 +16,8 @@ export function DockMenu({ activeTab, onTabChange, userType }: DockMenuProps) {
     ];
 
     if (userType === 'treinador') {
+        items.push({ id: 'team', label: 'Equipa', icon: Users, hue: 200 });
+        items.push({ id: 'games', label: 'Jogos', icon: Trophy, hue: 45 });
         items.push({ id: 'pending', label: 'Pendentes', icon: Users, hue: 10 });
     }
 

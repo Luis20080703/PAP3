@@ -4,10 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
 class Jogo extends Model
 {
     protected $fillable = [
@@ -17,6 +13,11 @@ class Jogo extends Model
         'golos_sofridos',
         'data_jogo'
     ];
+
+    public function atletaStats()
+    {
+        return $this->hasMany(AtletaJogoStat::class);
+    }
 
     public function equipa()
     {

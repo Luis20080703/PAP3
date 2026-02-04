@@ -44,6 +44,12 @@ export function AdminDashboard() {
     const [newTeamEscalao, setNewTeamEscalao] = useState('');
     const [isCreatingTeam, setIsCreatingTeam] = useState(false);
 
+    // Filter States
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterTeam, setFilterTeam] = useState('all');
+    const [filterPending, setFilterPending] = useState(false);
+    const [sortRecent, setSortRecent] = useState(true);
+
     // Edit Team State
     const [editingTeam, setEditingTeam] = useState<any>(null);
     const [isEditTeamOpen, setIsEditTeamOpen] = useState(false);
@@ -106,6 +112,18 @@ export function AdminDashboard() {
             }
         } catch (e) {
             toast.error("Erro ao alterar estado premium");
+        }
+    };
+
+    const handleToggleValidation = async (id: number) => {
+        try {
+            const res = await adminAPI.toggleValidation(id);
+            if (res.success) {
+                toast.success(res.message);
+                await loadData();
+            }
+        } catch (e) {
+            toast.error("Erro ao alterar estado de validação");
         }
     };
 
@@ -276,6 +294,21 @@ export function AdminDashboard() {
         }
     };
 
+    const filteredUsers = allUsers
+        .filter(u => {
+            const matchesSearch = u.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                u.email.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesTeam = filterTeam === 'all' || u.equipa === filterTeam;
+            const matchesPending = !filterPending || !u.validado;
+            return matchesSearch && matchesTeam && matchesPending;
+        })
+        .sort((a, b) => {
+            if (sortRecent) {
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            }
+            return a.nome.localeCompare(b.nome);
+        });
+
     if (!user || !['admin', 'root'].includes(user.tipo)) return null;
 
     return (
@@ -285,7 +318,7 @@ export function AdminDashboard() {
                 <div className="space-y-1">
                     <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 flex items-center gap-3">
                         <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600 animate-pulse" />
-                        Master Panel
+                        Painel de Administração
                     </h2>
                     <div className="text-sm sm:text-base text-gray-500 font-medium tracking-wide flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" />
@@ -489,15 +522,58 @@ export function AdminDashboard() {
                                 <Users className="w-5 h-5 text-gray-300" />
                                 GESTÃO DE UTILIZADORES
                             </span>
-                            <span className="text-xs font-mono opacity-50">{allUsers.length} RECORDS</span>
+                            <span className="text-xs font-mono opacity-50">{filteredUsers.length} REGISTOS</span>
                         </div>
+
+                        <div className="bg-white border-x border-b border-gray-300 p-6 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Pesquisar Utilizador</Label>
+                                    <div className="relative">
+                                        <Input
+                                            placeholder="Nome ou Email..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="h-10 pl-9 font-mono border-2 border-gray-200 focus:border-blue-500 rounded-none bg-gray-50 text-sm"
+                                        />
+                                        <User className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Filtrar por Equipa</Label>
+                                    <Select value={filterTeam} onValueChange={setFilterTeam}>
+                                        <SelectTrigger className="h-10 font-mono border-2 border-gray-200 focus:border-blue-500 rounded-none bg-gray-50 text-xs text-left px-3">
+                                            <SelectValue placeholder="EQUIPA" />
+                                        </SelectTrigger>
+                                        <SelectContent className="font-mono border-2 border-gray-200 rounded-none max-h-[200px] bg-white">
+                                            <SelectItem value="all">TODAS AS EQUIPAS</SelectItem>
+                                            {equipas.map(e => (
+                                                <SelectItem key={e.id} value={e.nome}>{e.nome.toUpperCase()}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-center gap-3 h-10 px-4 bg-gray-50 border-2 border-dashed border-gray-200">
+                                    <input type="checkbox" id="pending-only" checked={filterPending} onChange={(e) => setFilterPending(e.target.checked)} className="w-4 h-4" />
+                                    <label htmlFor="pending-only" className="text-[10px] font-bold text-gray-600 cursor-pointer">PENDENTES</label>
+                                </div>
+
+                                <div className="flex items-center gap-3 h-10 px-4 bg-gray-50 border-2 border-dashed border-gray-200">
+                                    <input type="checkbox" id="sort-recent" checked={sortRecent} onChange={(e) => setSortRecent(e.target.checked)} className="w-4 h-4" />
+                                    <label htmlFor="sort-recent" className="text-[10px] font-bold text-gray-600 cursor-pointer">RECENTES</label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="retro-card__data">
                             {/* Left Column: User Details */}
                             <div className="retro-card__right">
                                 <div className="retro-item retro-header">
                                     IDENTIFICAÇÃO / CARGO
                                 </div>
-                                {allUsers.map((u) => (
+                                {filteredUsers.map((u) => (
                                     <div key={u.id} className="retro-item">
                                         <div className="flex items-center gap-4 w-full">
                                             <div className="w-12 h-12 rounded-lg bg-gray-200 border-2 border-gray-300 flex items-center justify-center text-gray-600 font-black text-xl shrink-0">
@@ -530,28 +606,32 @@ export function AdminDashboard() {
                                 <div className="retro-item retro-header justify-end">
                                     ESTADO / AÇÕES
                                 </div>
-                                {allUsers.map((u) => (
+                                {filteredUsers.map((u) => (
                                     <div key={u.id} className="retro-item justify-end gap-2">
 
                                         {/* Status Badge */}
-                                        <div className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded border text-[10px] font-bold uppercase tracking-wider mr-2 ${u.validado ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
-                                            }`}>
+                                        <button
+                                            onClick={() => handleToggleValidation(u.id)}
+                                            className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded border text-[10px] font-bold uppercase tracking-wider mr-2 transition-all hover:scale-105 active:scale-95 ${u.validado ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                                                }`}>
                                             <div className={`w-1.5 h-1.5 rounded-full ${u.validado ? 'bg-green-500' : 'bg-red-500'}`} />
                                             {u.validado ? 'Ativo' : 'Bloq'}
-                                        </div>
-
-                                        {/* Premium Toggle */}
-                                        <button
-                                            onClick={() => handleTogglePremium(u.id)}
-                                            className={`h-8 px-2 rounded border text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 ${u.is_premium
-                                                ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
-                                                : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
-                                                }`}
-                                            title="Toggle Premium"
-                                        >
-                                            <Zap className={`w-3 h-3 ${u.is_premium ? 'fill-amber-600' : ''}`} />
-                                            <span className="hidden lg:inline">{u.is_premium ? 'Elite' : 'Std'}</span>
                                         </button>
+
+                                        {/* Premium Toggle - Only for coaches */}
+                                        {u.tipo === 'treinador' && (
+                                            <button
+                                                onClick={() => handleTogglePremium(u.id)}
+                                                className={`h-8 px-2 rounded border text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 ${u.is_premium
+                                                    ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
+                                                    : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                                                    }`}
+                                                title="Toggle Premium"
+                                            >
+                                                <Zap className={`w-3 h-3 ${u.is_premium ? 'fill-amber-600' : ''}`} />
+                                                <span className="hidden lg:inline">{u.is_premium ? 'Elite' : 'Base'}</span>
+                                            </button>
+                                        )}
 
                                         <div className="h-4 w-px bg-gray-200 mx-1"></div>
 

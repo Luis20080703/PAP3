@@ -7,6 +7,8 @@ import { TeamStatsSection } from './TeamStatsSection';
 import { AthleteStatsSection } from './AthleteStatsSection';
 import { TrainerAthleteStatsView } from './TrainerAthleteStatsView';
 import { PendingAthletesView } from './PendingAthletesView';
+import { GamesSection } from './GamesSection';
+import { TeamManagementSection } from './TeamManagementSection';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminSidebar } from './AdminSidebar';
 import { useApp } from '../context/AppContext';
@@ -68,50 +70,68 @@ export function Dashboard({ onLogout, onNavigateToPremium }: DashboardProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header for regular users */}
-      <header className="bg-blue-600 text-white py-4 px-4 md:px-8 shadow-lg">
-        <div className="w-full max-w-[1920px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <header className="relative bg-blue-900 text-white py-12 md:py-72 px-4 md:px-8 shadow-lg transition-all duration-500">
+        {/* Background Image & Overlay */}
+        <div
+          className="absolute inset-0 z-0 overflow-hidden rounded-b-3xl opacity-50 mix-blend-overlay"
+          style={{
+            backgroundImage: 'url(/hero-handball-2.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 20%',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/70 to-blue-900/90" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-gray-50 to-transparent" />
+        </div>
+
+        <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-row justify-between items-center gap-2 md:gap-8 mb-28 md:mb-20">
           <div>
-            <h1 className="flex items-center gap-2 text-lg md:text-2xl lg:text-3xl font-bold">
-              <img src="/logo.png" alt="NexusHand Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain brightness-0 invert" />
-              <span className="animate-text-shine">NexusHand</span>
+            <h1 className="flex items-center gap-2 md:gap-6 text-xl md:text-6xl font-black tracking-tighter">
+              <img src="/logo.png" alt="NexusHand Logo" className="w-12 h-12 md:w-40 md:h-40 object-contain brightness-0 invert drop-shadow-2xl" />
+              <span className="animate-text-shine drop-shadow-xl bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent bg-[length:200%_auto]">NexusHand</span>
             </h1>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+          <div className="flex flex-row items-center gap-3 md:gap-6">
             {user.tipo === 'treinador' && onNavigateToPremium && (
               <Button
                 onClick={onNavigateToPremium}
-                className={`${user.is_premium ? 'premium-button' : 'premium-button hover:scale-105 transition-all'} text-white font-bold border-none shadow-lg`}
-                size="sm"
+                className={`${user.is_premium ? 'premium-button' : 'premium-button hover:scale-105 transition-all'} hidden md:flex text-white font-bold border-none shadow-xl text-lg px-8 py-6 rounded-2xl`}
               >
                 {user.is_premium ? '🌟 Área Premium' : '👑 Aderir ao Premium'}
               </Button>
             )}
-            <div className="text-center sm:text-right">
-              <div className="font-medium text-lg">{user.nome}</div>
-              <div className="text-sm lg:text-base text-blue-100 uppercase font-bold tracking-tighter">
+            <div className="text-right space-y-0.5 md:space-y-1">
+              <div className="font-bold text-sm md:text-3xl drop-shadow-lg">{user.nome}</div>
+              <div className="text-[10px] md:text-lg text-blue-200 uppercase font-bold tracking-widest drop-shadow-md bg-blue-900/40 px-2 md:px-4 py-0.5 md:py-1 rounded-full backdrop-blur-sm border border-blue-500/30">
                 {user.tipo === 'atleta' ? 'Atleta' : 'Treinador'} • {user.equipa || 'Sem Equipa'}
               </div>
             </div>
-            <button className="Btn" onClick={onLogout}>
+            <button className="Btn scale-75 md:scale-110" onClick={onLogout}>
               <div className="sign">
                 <svg viewBox="0 0 512 512">
                   <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
                 </svg>
               </div>
-              <div className="text">Logout</div>
+              <div className="text">Sair</div>
             </button>
           </div>
+        </div>
+
+        {/* Dock Menu Positioned Inside Header */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto pb-0">
+          <DockMenu
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            userType={user.tipo}
+          />
         </div>
       </header>
 
       {/* Main Content for regular users */}
       <main className="w-full max-w-[1920px] mx-auto py-8 px-4 md:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <DockMenu
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            userType={user.tipo}
-          />
+          {/* DockMenu moved to header */}
 
           <TabsContent value="plays" className="animate-in fade-in duration-500">
             <PlaysSection />
@@ -134,9 +154,17 @@ export function Dashboard({ onLogout, onNavigateToPremium }: DashboardProps) {
           </TabsContent>
 
           {user.tipo === 'treinador' && (
-            <TabsContent value="pending" className="animate-in fade-in duration-500">
-              <PendingAthletesView />
-            </TabsContent>
+            <>
+              <TabsContent value="team" className="animate-in fade-in duration-500">
+                <TeamManagementSection />
+              </TabsContent>
+              <TabsContent value="games" className="animate-in fade-in duration-500">
+                <GamesSection />
+              </TabsContent>
+              <TabsContent value="pending" className="animate-in fade-in duration-500">
+                <PendingAthletesView />
+              </TabsContent>
+            </>
           )}
         </Tabs>
       </main>

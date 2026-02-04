@@ -4,8 +4,7 @@
   TeamStatsDisplay,
   AthleteStatsDisplay,
   CommentDisplay,
-  User,
-  UserType
+  User
 } from '../types';
 
 // ✅ FUNÇÃO ATUALIZADA PARA CONVERTER TIPOS
@@ -15,6 +14,11 @@ const mapUserType = (laravelType: string): 'atleta' | 'treinador' => {
 
 // ✅ URL CENTRALIZADA DO SERVIDOR - DINÂMICA
 const getAPIBaseURL = () => {
+  // ✅ Piority: Environment Variable (for production/ngrok)
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
   if (typeof window === 'undefined') {
     return 'http://localhost:8000/api';
   }
@@ -27,11 +31,18 @@ const getAPIBaseURL = () => {
   }
 
   // ✅ DETECÇÃO AUTOMÁTICA
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  const hostname = window.location.hostname;
+
+  // Se estiver a usar ngrok, usar caminho relativo (via proxy do Vite)
+  if (hostname.includes('ngrok') || hostname.includes('loca.lt')) {
+    return '/api';
+  }
+
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:8000/api';
   }
 
-  return `http://${window.location.hostname}:8000/api`;
+  return `http://${hostname}:8000/api`;
 };
 
 export const API_BASE_URL = getAPIBaseURL();
@@ -96,22 +107,36 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
       throw new Error('Sessão expirada. Por favor faça login novamente.');
     }
 
-    // ✅ CHECK FOR 403 (Forbidden) - Just log warning to console
+    // ✅ CHECK FOR 403 (Forbidden)
     if (response.status === 403) {
-      console.warn('⚠️ Acesso negado (403). Possível troca de sessão entre separadores.');
+      console.warn('⚠️ Acesso negado (403).');
     }
 
-    let errorMessage = `API error: ${response.status} ${response.statusText}`;
+    let errorMessage = '';
+
     try {
-      const errorJson = await response.json();
-      if (errorJson.message) {
+      const clonedResponse = response.clone();
+      const errorJson = await clonedResponse.json();
+
+      if (errorJson.errors) {
+        errorMessage = Object.values(errorJson.errors).flat().join(' ');
+      } else if (errorJson.error?.message) {
+        errorMessage = errorJson.error.message;
+      } else if (errorJson.message) {
         errorMessage = errorJson.message;
       }
     } catch (e) {
-      // If parsing fails, use fallback text
-      const errorText = await response.text().catch(() => '');
-      if (errorText) errorMessage += ` - ${errorText}`;
+      errorMessage = await response.text().catch(() => '');
     }
+
+    if (!errorMessage || errorMessage.length < 5) {
+      if (response.status === 403) {
+        errorMessage = "A sua conta ainda não foi validada. Por favor, aguarde a aprovação do treinador ou administrador.";
+      } else {
+        errorMessage = `API error: ${response.status} ${response.statusText}`;
+      }
+    }
+
     throw new Error(errorMessage);
   }
 
@@ -120,11 +145,11 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
 
 // Auth API
 export const authAPI = {
-  async login(email: string, password: string): Promise<User> {
+  async login(email: string, password: string, cipa?: string): Promise<User> {
     try {
       const response = await apiCall('/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, cipa }),
       });
 
       if (response.success && response.user) {
@@ -164,6 +189,9 @@ export const authAPI = {
     }
     if (userData.escalao !== undefined) {
       registerData.escalao = userData.escalao;
+    }
+    if (userData.cipa !== undefined) {
+      registerData.cipa = userData.cipa; // ✅ Add CIPA to payload
     }
 
     console.log('📤 [REGISTER API] Dados COMPLETOS a enviar para Laravel:', registerData);
@@ -730,6 +758,11 @@ export const athleteStatsAPI = {
 
   async getPublicStats(): Promise<any> {
     return apiCall('/estatisticas-atletas');
+  },
+
+  async getMyGameStats(): Promise<any> {
+    const response = await apiCall('/atleta/jogos');
+    return response;
   }
 };
 
@@ -755,6 +788,16 @@ export const trainersAPI = {
     return apiCall(`/treinador/rejeitar-atleta/${id}`, {
       method: 'DELETE'
     });
+  },
+
+  async getTeamGames(): Promise<any[]> {
+    try {
+      const response = await apiCall('/treinador/meus-jogos');
+      return response.data || [];
+    } catch (error) {
+      console.error('❌ [TRAINERS API] Erro a buscar jogos da equipa', error);
+      return [];
+    }
   }
 };
 
@@ -829,6 +872,12 @@ export const adminAPI = {
     });
   },
 
+  async toggleValidation(userId: number): Promise<any> {
+    return apiCall(`/admin/users/${userId}/toggle-validation`, {
+      method: 'POST'
+    });
+  },
+
   async updateUser(userId: number, data: any): Promise<any> {
     return apiCall(`/admin/users/${userId}/update`, {
       method: 'POST',
@@ -883,6 +932,24 @@ export const escaloesAPI = {
       console.error('❌ [ESCALÕES API] Erro ao buscar escalões', error);
       return [];
     }
+  }
+};
+
+// Atletas API
+export const atletasAPI = {
+  async getAll(): Promise<any> {
+    return apiCall('/atletas');
+  },
+  async update(id: number | string, data: any): Promise<any> {
+    return apiCall(`/atletas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  async delete(id: number | string): Promise<any> {
+    return apiCall(`/atletas/${id}`, {
+      method: 'DELETE'
+    });
   }
 };
 

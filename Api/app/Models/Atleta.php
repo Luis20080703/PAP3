@@ -15,11 +15,13 @@ class Atleta extends Model
         'epoca_id',
         'posicao',
         'numero',
-        'escalao'
+        'escalao',
+        'cipa'
     ];
 
     protected $casts = [
         'numero' => 'integer',
+        'cipa' => 'integer',
     ];
 
     // ==================== RELAÇÕES ====================
@@ -37,6 +39,11 @@ class Atleta extends Model
     public function epoca()
     {
         return $this->belongsTo(Epoca::class);
+    }
+
+    public function jogoStats()
+    {
+        return $this->hasMany(AtletaJogoStat::class);
     }
 
     public function estatisticas()

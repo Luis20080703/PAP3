@@ -212,6 +212,7 @@ export function PlaysSection() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
+          <br />
           <h2 className="text-2xl font-bold">Jogadas</h2>
           <p className="text-gray-600">
             Partilhe e comente jogadas com a comunidade
@@ -220,9 +221,10 @@ export function PlaysSection() {
         {user.tipo !== 'admin' && user.tipo !== 'root' && (
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="btn-create-play w-full sm:w-auto h-auto">
-                <Plus className="w-5 h-5 mr-3" />
-                Nova Jogada
+              <Button className="btn-create-play w-auto h-auto py-2 sm:py-2.5 px-4 sm:px-6 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-xs sm:text-base">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Nova Jogada</span>
+                <span className="sm:hidden">Nova</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="jogada-btn">
@@ -374,7 +376,15 @@ export function PlaysSection() {
           <LoadingWave />
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+        <div
+          className="grid w-full"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+            columnGap: '2.5rem',
+            rowGap: '3.5rem',
+            justifyItems: 'start'
+          }}
+        >
           {filteredPlays.map((play: PlayDisplay) => {
             return (
               <div key={play.id} className="play-tip-card">
@@ -434,7 +444,7 @@ export function PlaysSection() {
                     </DialogTrigger>
                     <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>{play.titulo}</DialogTitle>
+                        <DialogTitle className="text-xl sm:text-2xl">{play.titulo}</DialogTitle>
                         <DialogDescription>
                           por {play.autorNome} • {play.equipa} • {play.criadoEm.toLocaleDateString()}
                         </DialogDescription>
@@ -484,7 +494,7 @@ export function PlaysSection() {
                             />
                             <Button
                               onClick={() => handleAddComment(play.id)}
-                              className="w-full"
+                              className="w-full sm:w-auto sm:px-8 mx-auto"
                               disabled={isSubmitting}
                             >
                               {isSubmitting ? (
@@ -493,7 +503,7 @@ export function PlaysSection() {
                                   A publicar...
                                 </>
                               ) : (
-                                'Publicar Comentário'
+                                'Publicar'
                               )}
                             </Button>
                           </div>
@@ -656,7 +666,7 @@ function VideoPreview({ url }: { url: string }) {
   const isYouTube = url?.includes('youtube.com') || url?.includes('youtu.be');
   const isLocalFile = url?.startsWith('local:');
   const isExampleUrl = url?.includes('example.com');
-  const isValidUrl = url && url !== 'default.mp4' && url.startsWith('http') && !isExampleUrl;
+  const isValidUrl = url && url !== 'default.mp4' && (url.startsWith('http') || url.startsWith('/storage')) && !isExampleUrl;
 
   if (isYouTube) {
     const videoId = url.includes('youtube.com')
@@ -725,7 +735,7 @@ function VideoPlayer({ url }: { url: string }) {
   const isYouTube = url?.includes('youtube.com') || url?.includes('youtu.be');
   const isLocalFile = url?.startsWith('local:');
   const isExampleUrl = url?.includes('example.com');
-  const isValidUrl = url && url !== 'default.mp4' && url.startsWith('http') && !isExampleUrl;
+  const isValidUrl = url && url !== 'default.mp4' && (url.startsWith('http') || url.startsWith('/storage')) && !isExampleUrl;
 
   if (isYouTube) {
     let embedUrl = '';

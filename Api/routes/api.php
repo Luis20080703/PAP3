@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\EstatisticaEquipaController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\EscalaoController;
 use App\Http\Controllers\Api\TreinadorController;
+use App\Http\Controllers\Api\AtletaController;
+use App\Http\Controllers\Api\JogoController;
+use App\Http\Controllers\Api\JogoImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +50,12 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+    // Jogo Import routes (Specific routes must come before Resource routes)
+    Route::get('/jogos/template', [JogoImportController::class, 'downloadTemplate']);
+    Route::get('/jogos/{id}/export', [JogoImportController::class, 'exportGame']);
+    Route::post('/jogos/import', [JogoImportController::class, 'import']);
+    Route::get('/treinador/meus-jogos', [JogoController::class, 'getMyTeamGames']);
+
     Route::apiResource('users', UserController::class);
     Route::apiResource('equipas', EquipaController::class)->except(['index']);
     Route::apiResource('epocas', EpocaController::class)->except(['index']);
@@ -54,9 +63,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('dicas', DicaController::class);
     Route::apiResource('comentarios', ComentarioController::class);
     Route::apiResource('escaloes', EscalaoController::class)->except(['index']);
-    
+    Route::apiResource('jogos', JogoController::class);
+    Route::apiResource('atletas', AtletaController::class);
+
     Route::get('/estatisticas-atleta', [EstatisticaAtletaController::class, 'showMyStats']);
     Route::post('/estatisticas-atleta', [EstatisticaAtletaController::class, 'store']);
+    Route::get('/atleta/jogos', [AtletaController::class, 'getMyGameStats']);
     Route::get('/estatisticas-equipas', [EstatisticaEquipaController::class, 'index']);
 
     // Trainer routes
@@ -72,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/pending-athletes', [AdminController::class, 'getPendingAthletes']); // ✅ New route
         Route::post('/validate-treinador/{id}', [AdminController::class, 'validateTreinador']); // Keep for backward compat
         Route::post('/validate-user/{id}', [AdminController::class, 'validateUser']); // ✅ New generic route
+        Route::post('/users/{id}/toggle-validation', [AdminController::class, 'toggleValidation']);
         Route::post('/users/{id}/role', [AdminController::class, 'updateUserRole']);
         Route::post('/users/{id}/update', [AdminController::class, 'updateUserRole']); // Duo use
         Route::post('/users/{id}/toggle-premium', [AdminController::class, 'togglePremium']);

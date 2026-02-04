@@ -100,4 +100,39 @@ class JogoController extends Controller
             'message' => 'Jogo removido com sucesso!'
         ]);
     }
+
+    /**
+     * Get games for the authenticated coach's team.
+     */
+    public function getMyTeamGames(Request $request)
+    {
+        $user = $request->user();
+        $equipaId = null;
+
+        $treinador = \App\Models\Treinador::where('user_id', $user->id)->first();
+        if ($treinador) {
+            $equipaId = $treinador->equipa_id;
+        } elseif (in_array($user->tipo, ['root', 'admin'])) {
+            // Admins see everything? Or just first team for now as per import logic
+            return $this->index(); 
+        } elseif ($user->equipa) {
+            $equipa = \App\Models\Equipa::where('nome', $user->equipa)->first();
+            if ($equipa) {
+                $equipaId = $equipa->id;
+            }
+        }
+
+        if (!$equipaId) {
+            return response()->json(['success' => false, 'message' => 'Equipa não encontrada.'], 403);
+        }
+
+        $jogos = Jogo::where('equipa_id', $equipaId)
+            ->orderBy('data_jogo', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $jogos
+        ]);
+    }
 }
