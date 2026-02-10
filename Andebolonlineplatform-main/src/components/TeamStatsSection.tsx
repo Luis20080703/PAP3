@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Card, CardContent, CardDescription, CardTitle } from './ui/card';
 import { athleteStatsAPI } from '../services/api';
-import { Badge } from './ui/badge';
-import { TrendingUp, TrendingDown, Loader2, Trophy, Target, AlertTriangle } from 'lucide-react';
+import { Loader2, Trophy, Target, AlertTriangle, TrendingDown, Medal } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { LoadingWave } from './ui/LoadingWave';
 
@@ -24,7 +21,7 @@ interface TopScorer {
 }
 
 export function TeamStatsSection() {
-  const { user, estatisticasEquipas, estatisticasCarregando } = useApp();
+  const { user, estatisticasCarregando } = useApp();
 
   const [teamStats, setTeamStats] = useState<TeamAggregatedStats>({ totalGolos: 0, totalDoisMinutos: 0, totalVermelhos: 0, totalJogos: 0 });
   const [topScorers, setTopScorers] = useState<TopScorer[]>([]);
@@ -48,17 +45,27 @@ export function TeamStatsSection() {
 
         setTeamStats(stats);
 
+        console.log('📊 Raw API Data:', data.data); // Debug completo
+
         const scorers = data.data
-          .map((atleta: any) => ({
-            nome: atleta.atleta?.user?.nome || atleta.atleta_nome || 'Atleta',
-            equipa: atleta.atleta?.equipa?.nome || 'Sem Equipa',
-            golos: atleta.golos_marcados || 0,
-            jogos: atleta.jogos || 0,
-            media: atleta.media_golos || 0
-          }))
+          .filter((item: any) => {
+            const golos = item.golos_marcados || item.golos || 0;
+            console.log(`Atleta: ${item.atleta?.user?.nome || 'N/A'}, Golos: ${golos}`);
+            return golos > 0;
+          })
+          .map((item: any) => {
+            const nome = item.atleta?.user?.nome || item.nome || item.atleta_nome || 'Atleta';
+            const equipa = item.atleta?.equipa?.nome || item.equipa || 'Sem Equipa';
+            const golos = item.golos_marcados || item.golos || 0;
+            const jogos = item.jogos || 1;
+            const media = jogos > 0 ? golos / jogos : 0;
+
+            return { nome, equipa, golos, jogos, media };
+          })
           .sort((a: TopScorer, b: TopScorer) => b.golos - a.golos)
           .slice(0, 5);
 
+        console.log('🏆 Top Scorers Final:', scorers);
         setTopScorers(scorers);
       }
     } catch (error) {
@@ -70,11 +77,6 @@ export function TeamStatsSection() {
 
   if (!user) return null;
 
-  const filteredStats = estatisticasEquipas;
-
-  const calculateAverage = (total: number, matches: number) => {
-    return (total / matches).toFixed(1);
-  };
 
 
 
@@ -139,48 +141,76 @@ export function TeamStatsSection() {
             </div>
 
             {/* Top 5 Marcadores */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-yellow-600" />
-                  Top 5 Melhores Marcadores
-                </CardTitle>
-                <CardDescription>Os atletas com mais golos marcados</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div className="retro-card shadow-lg">
+              <div className="retro-card__title bg-yellow-600 py-3">
+                <span className="text-xs flex items-center gap-2">
+                  <Trophy className="w-3 h-3" /> TOP 5 MELHORES MARCADORES
+                </span>
+              </div>
+              <div className="bg-white border-x border-b border-gray-300">
                 {loading ? (
-                  <div className="flex justify-center py-4">
-                    <Loader2 className="w-6 h-6 animate-spin" />
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
                   </div>
                 ) : topScorers.length > 0 ? (
-                  <div className="space-y-3">
-                    {topScorers.map((scorer, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${index === 0 ? 'bg-yellow-500' :
-                            index === 1 ? 'bg-gray-400' :
-                              index === 2 ? 'bg-amber-600' : 'bg-blue-500'
-                            } `}>
-                            {index + 1}
-                          </div>
-                          <div>
-                            <div className="font-semibold">{scorer.nome}</div>
-                            <div className="text-xs text-gray-500 font-bold">{scorer.equipa}</div>
-                            <div className="text-sm text-gray-600">{scorer.jogos} jogos</div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xl font-bold text-green-600">{scorer.golos}</div>
-                          <div className="text-sm text-gray-600">{scorer.media.toFixed(1)}/jogo</div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b-2 border-gray-200 bg-gray-50">
+                          <th className="text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">#</th>
+                          <th className="text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">Atleta / Equipa</th>
+                          <th className="text-center p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">Jogos</th>
+                          <th className="text-center p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">Golos</th>
+                          <th className="text-center p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">Média</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {topScorers.map((scorer, index) => (
+                          <tr key={index} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index === 0 ? 'bg-yellow-50' : ''}`}>
+                            <td className="p-3">
+                              <div className="flex justify-center items-center">
+                                {index === 0 ? (
+                                  <div className="relative flex items-center justify-center">
+                                    <Trophy className="w-10 h-10 text-yellow-500 drop-shadow-sm" fill="#EAB308" />
+                                  </div>
+                                ) : index === 1 ? (
+                                  <div className="relative flex items-center justify-center">
+                                    <Medal className="w-9 h-9 text-slate-400 drop-shadow-sm" fill="#94a3b8" />
+                                  </div>
+                                ) : index === 2 ? (
+                                  <div className="relative flex items-center justify-center">
+                                    <Medal className="w-9 h-9 text-amber-600 drop-shadow-sm" fill="#d97706" />
+                                  </div>
+                                ) : (
+                                  <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm">
+                                    {index + 1}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <div className="font-bold text-gray-900">{scorer.nome}</div>
+                              <div className="text-xs text-gray-500 font-semibold">{scorer.equipa}</div>
+                            </td>
+                            <td className="p-3 text-center">
+                              <div className="text-lg font-black text-gray-900 font-mono">{scorer.jogos}</div>
+                            </td>
+                            <td className="p-3 text-center">
+                              <div className="text-lg font-black text-emerald-600 font-mono">{scorer.golos}</div>
+                            </td>
+                            <td className="p-3 text-center">
+                              <div className="text-sm font-bold text-gray-700 font-mono">{scorer.media.toFixed(1)}<span className="text-xs text-gray-400">G/J</span></div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 ) : (
-                  <p className="text-center text-gray-500 py-4">Ainda não há marcadores registados</p>
+                  <p className="text-center text-gray-500 py-8 text-sm">Ainda não há marcadores registados</p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </>
         )}
       </div>

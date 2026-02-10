@@ -8,8 +8,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
-    DialogFooter
+    DialogDescription
 } from './ui/dialog';
 import {
     FileDown,
@@ -214,13 +213,17 @@ export function GamesSection() {
 
     return (
         <div className="max-w-5xl mx-auto p-4 space-y-12 mb-12">
-            <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-                    <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">Gestão de Jogos</h2>
-                    <p className="text-gray-500 font-medium tracking-wide">Importa estatísticas e gere o histórico da tua equipa</p>
+            {/* Header com Estilo Admin */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-12">
+                <div className="space-y-1">
+                    <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 flex items-center gap-3">
+                        <Trophy className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600 animate-pulse" />
+                        Gestão de Jogos
+                    </h2>
+                    <div className="text-sm sm:text-base text-gray-500 font-medium tracking-wide flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" />
+                        Importa estatísticas e gere o histórico da tua equipa
+                    </div>
                 </div>
             </div>
 
@@ -291,123 +294,162 @@ export function GamesSection() {
                 </Card>
             </div>
 
-            {/* Histórico */}
-            <Card className="border-2 border-gray-100 shadow-xl rounded-2xl overflow-hidden">
-                <CardHeader className="bg-gray-50/80 border-b-2 border-gray-100 py-6 px-8">
-                    <CardTitle className="text-xl font-bold flex items-center gap-3">
-                        <History className="w-6 h-6 text-blue-600" /> Histórico de Jogos
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {isLoadingHistory ? (
-                        <div className="p-20 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-blue-500" /></div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-50 border-b text-[10px] font-bold text-gray-400 uppercase tracking-widest px-8">
-                                        <th className="px-8 py-5">DATA</th>
-                                        <th className="px-8 py-5">ADVERSÁRIO</th>
-                                        <th className="px-8 py-5 text-center">RESULTADO</th>
-                                        <th className="px-8 py-5 text-center">AÇÕES</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100 text-sm font-bold text-gray-700">
-                                    {gameHistory.map((jogo) => (
-                                        <tr key={jogo.id} className="hover:bg-blue-50/30">
-                                            <td className="px-8 py-6">{new Date(jogo.data_jogo).toLocaleDateString()}</td>
-                                            <td className="px-8 py-6">{jogo.adversario}</td>
-                                            <td className="px-8 py-6 text-center">
-                                                <span className="bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
-                                                    {jogo.golos_marcados} - {jogo.golos_sofridos}
+            {/* Histórico com Estilo Admin/Retro */}
+            <div className="retro-card shadow-2xl">
+                <div className="retro-card__title">
+                    <span className="flex items-center gap-3">
+                        <History className="w-5 h-5 text-blue-300" />
+                        HISTÓRICO DE JOGOS
+                    </span>
+                    <span className="text-xs font-mono opacity-50">{gameHistory.length} JOGOS REGISTADOS</span>
+                </div>
+
+                <div className="retro-card__data">
+                    {/* Coluna Esquerda: Detalhes do Jogo */}
+                    <div className="retro-card__right">
+                        <div className="retro-item retro-header">
+                            DATA / ADVERSÁRIO / RESULTADO
+                        </div>
+                        {isLoadingHistory ? (
+                            <div className="retro-item justify-center">
+                                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                            </div>
+                        ) : gameHistory.length === 0 ? (
+                            <div className="retro-item text-center text-gray-400 font-mono">
+                                Nenhum jogo registado no histórico.
+                            </div>
+                        ) : (
+                            gameHistory.map((jogo) => (
+                                <div key={jogo.id} className="retro-item">
+                                    <div className="flex items-center gap-4 w-full">
+                                        <div className="w-12 h-12 rounded-lg bg-blue-100 border-2 border-blue-200 flex items-center justify-center text-blue-600 font-black text-xs shrink-0 font-mono text-center px-1">
+                                            {new Date(jogo.data_jogo).toLocaleDateString().split('/').slice(0, 2).join('/')}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <p className="font-bold text-gray-900 text-sm truncate leading-none">
+                                                    VS {jogo.adversario.toUpperCase()}
+                                                </p>
+                                            </div>
+                                            <p className="text-xs text-gray-400 font-mono mb-1.5">{new Date(jogo.data_jogo).toLocaleDateString()}</p>
+                                            <div className="flex items-center gap-2">
+                                                <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-[10px] font-black uppercase tracking-widest border border-gray-200">
+                                                    RESULTADO: {jogo.golos_marcados} - {jogo.golos_sofridos}
                                                 </span>
-                                            </td>
-                                            <td className="px-8 py-6 text-center space-x-2">
-                                                <button onClick={() => openEditModal(jogo)} className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-                                                    <FileEdit className="w-5 h-5" />
-                                                </button>
-                                                <button onClick={() => handleDeleteGame(jogo.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
-                                                    <Trash2 className="w-5 h-5" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* Modal de Edição */}
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="max-w-2xl bg-white p-0 overflow-hidden rounded-2xl border-none shadow-2xl">
-                    <DialogHeader className="bg-blue-600 p-8 text-white relative">
-                        <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3">
-                            <FileEdit className="w-6 h-6" /> Editar Jogo
-                        </DialogTitle>
-                        <DialogDescription className="text-blue-100 font-medium">
-                            Corrige os dados carregando um novo ficheiro CSV.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="p-8 space-y-8">
-                        {/* Passo A: Download */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">A</div>
-                                <h4 className="font-bold text-gray-900">Descarrega os dados atuais</h4>
-                            </div>
-                            <Button
-                                onClick={downloadCurrentGameCSV}
-                                variant="outline"
-                                className="w-full border-2 border-blue-100 text-blue-600 hover:bg-blue-50 font-bold py-6 rounded-xl"
-                            >
-                                <Download className="w-5 h-5 mr-2" />
-                                Baixar CSV para Edição
-                            </Button>
-                        </div>
-
-                        <div className="h-px bg-gray-100" />
-
-                        {/* Passo B: Upload */}
-                        <form onSubmit={handleEditSubmission} className="space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">B</div>
-                                <h4 className="font-bold text-gray-900">Envia o ficheiro corrigido</h4>
-                            </div>
-
-                            <div className="bg-gray-50 p-6 rounded-2xl border-2 border-gray-100 space-y-4">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                                        <FileUp className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-gray-900">Novo Ficheiro CSV</h4>
-                                        <p className="text-xs text-gray-500 font-medium">As informações do adversário e resultado também serão atualizadas pelo CSV.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <Input
-                                    type="file"
-                                    accept=".csv,.txt"
-                                    onChange={(e) => setEditFile(e.target.files?.[0] || null)}
-                                    className="h-24 border-2 border-dashed border-gray-200 bg-white/50 hover:bg-white hover:border-blue-400 transition-all cursor-pointer flex items-center justify-center text-center file:hidden pt-8"
-                                />
-                                <p className="text-[10px] text-gray-400 italic">O sistema irá reverter automaticamente as estatísticas anteriores e aplicar as novas do CSV.</p>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Coluna Direita: Ações */}
+                    <div className="retro-card__left">
+                        <div className="retro-item retro-header justify-end">
+                            OPERAÇÕES
+                        </div>
+                        {!isLoadingHistory && gameHistory.map((jogo) => (
+                            <div key={jogo.id} className="retro-item justify-end gap-2">
+                                <div className="flex items-center bg-gray-100 rounded-md border border-gray-200">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => openEditModal(jogo)}
+                                        className="h-9 w-9 text-gray-400 hover:text-blue-600 hover:bg-white rounded-none border-r border-gray-200"
+                                        title="Editar Jogo"
+                                    >
+                                        <FileEdit className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleDeleteGame(jogo.id)}
+                                        className="h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-white rounded-none"
+                                        title="Remover Jogo"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Modal de Edição - Estilo Admin */}
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent className="sm:max-w-2xl p-0 bg-transparent border-none shadow-none">
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Editar Jogo</DialogTitle>
+                        <DialogDescription>Formulário para editar os dados de um jogo através de CSV.</DialogDescription>
+                    </DialogHeader>
+                    <div className="retro-card mb-0 shadow-2xl">
+                        <div className="retro-card__title">
+                            <span className="flex items-center gap-3">
+                                <FileEdit className="w-5 h-5 text-blue-500" />
+                                EDITAR DADOS DO JOGO
+                            </span>
+                        </div>
+                        <div className="bg-white border-x border-b border-gray-300 p-8 flex flex-col gap-8">
+                            {/* Passo A: Download */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs font-mono">STEP A</div>
+                                    <h4 className="font-black text-gray-900 uppercase tracking-tighter">Descarregar dados atuais</h4>
+                                </div>
+                                <Button
+                                    onClick={downloadCurrentGameCSV}
+                                    className="w-full bg-white text-blue-600 border-2 border-blue-100 hover:bg-blue-50 font-black py-8 rounded-none shadow-sm transition-all"
+                                >
+                                    <Download className="w-5 h-5 mr-3" />
+                                    BAIXAR CSV PARA EDIÇÃO
+                                </Button>
+                                <p className="text-[10px] text-gray-400 font-mono italic">Os dados atuais do jogo serão exportados para que os possas corrigir.</p>
                             </div>
 
-                            <DialogFooter className="pt-4 gap-3">
-                                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="font-bold">Cancelar</Button>
-                                <Button
-                                    type="submit"
-                                    disabled={isUploading || !editFile}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-6 rounded-xl shadow-lg"
-                                >
-                                    {isUploading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <RefreshCw className="w-5 h-5 mr-2" />}
-                                    Guardar Alterações
-                                </Button>
-                            </DialogFooter>
-                        </form>
+                            <div className="h-px bg-gray-100 border-t-2 border-dashed border-gray-200" />
+
+                            {/* Passo B: Upload */}
+                            <form onSubmit={handleEditSubmission} className="space-y-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs font-mono">STEP B</div>
+                                    <h4 className="font-black text-gray-900 uppercase tracking-tighter">Enviar ficheiro corrigido</h4>
+                                </div>
+
+                                <div className="bg-gray-50 border-2 border-gray-100 p-6 space-y-4">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                                            <FileUp className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-900 text-sm">Novo Ficheiro CSV</h4>
+                                            <p className="text-[10px] text-gray-500 font-mono">O sistema irá reprocessar as estatísticas automaticamente.</p>
+                                        </div>
+                                    </div>
+                                    <Input
+                                        type="file"
+                                        accept=".csv,.txt"
+                                        onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+                                        className="h-24 border-2 border-dashed border-gray-200 bg-white/50 hover:bg-white hover:border-blue-400 transition-all cursor-pointer flex items-center justify-center text-center file:hidden pt-8 font-mono text-xs"
+                                    />
+                                </div>
+
+                                <div className="flex justify-end gap-3 pt-4">
+                                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="font-black uppercase text-xs tracking-widest text-gray-400">
+                                        CANCELAR
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={isUploading || !editFile}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-6 rounded-none shadow-md flex-1 gap-2 uppercase tracking-widest"
+                                    >
+                                        {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
+                                        Guardar Alterações
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>

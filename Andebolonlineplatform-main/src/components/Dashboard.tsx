@@ -102,8 +102,8 @@ export function Dashboard({ onLogout, onNavigateToPremium }: DashboardProps) {
               </Button>
             )}
             <div className="text-right space-y-0.5 md:space-y-1">
-              <div className="font-bold text-sm md:text-3xl drop-shadow-lg">{user.nome}</div>
-              <div className="text-[10px] md:text-lg text-blue-200 uppercase font-bold tracking-widest drop-shadow-md bg-blue-900/40 px-2 md:px-4 py-0.5 md:py-1 rounded-full backdrop-blur-sm border border-blue-500/30">
+              <div className="font-bold text-xs md:text-xl drop-shadow-lg text-blue-600">{user.nome}</div>
+              <div className="text-xs md:text-xl text-blue-600 uppercase font-bold tracking-widest drop-shadow-md bg-blue-900/40 px-2 md:px-4 py-0.5 md:py-1 rounded-full backdrop-blur-sm border border-blue-500/30">
                 {user.tipo === 'atleta' ? 'Atleta' : 'Treinador'} • {user.equipa || 'Sem Equipa'}
               </div>
             </div>

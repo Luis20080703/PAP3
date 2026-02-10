@@ -763,6 +763,11 @@ export const athleteStatsAPI = {
   async getMyGameStats(): Promise<any> {
     const response = await apiCall('/atleta/jogos');
     return response;
+  },
+
+  async getAthleteGameStats(athleteId: number | string): Promise<any> {
+    const response = await apiCall(`/atleta/${athleteId}/jogos`);
+    return response;
   }
 };
 

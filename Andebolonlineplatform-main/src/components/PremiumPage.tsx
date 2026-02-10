@@ -156,7 +156,7 @@ export function PremiumPage({ onBack }: PremiumPageProps) {
                             <h3 className="text-4xl font-black text-blue-400 tracking-tight flex items-center gap-2 mt-4">
                                 <span className="text-blue-500">★</span> PRO
                             </h3>
-                            <span className="text-xl font-medium text-blue-200/80">5€/mês</span>
+                            <span className="text-xl font-medium text-blue-200/80">4,99€/mês</span>
                             <p className="text-blue-400/70 text-lg mt-2 font-medium">Poder total sem limites</p>
 
                             <div className="w-full h-px bg-blue-500/10 my-6"></div>
@@ -198,7 +198,7 @@ export function PremiumPage({ onBack }: PremiumPageProps) {
                         <div className="infotop">
 
                             <h3 className="text-4xl font-black text-indigo-400 tracking-tight flex items-center gap-2 mt-4">
-                                <span className="text-indigo-400">★</span> Elite
+                                <span className="text-indigo-400">★</span> Poupança
                             </h3>
                             <span className="text-xl font-medium text-indigo-200/80">14,99  €/3 meses</span>
                             <p className="text-indigo-400/70 text-lg mt-2 font-medium">O Pack de Performance</p>

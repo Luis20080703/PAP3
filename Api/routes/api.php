@@ -69,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/estatisticas-atleta', [EstatisticaAtletaController::class, 'showMyStats']);
     Route::post('/estatisticas-atleta', [EstatisticaAtletaController::class, 'store']);
     Route::get('/atleta/jogos', [AtletaController::class, 'getMyGameStats']);
+    Route::get('/atleta/{id}/jogos', [AtletaController::class, 'getAthleteGameStats']);
     Route::get('/estatisticas-equipas', [EstatisticaEquipaController::class, 'index']);
 
     // Trainer routes

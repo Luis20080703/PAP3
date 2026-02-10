@@ -139,6 +139,9 @@ class AtletaController extends Controller
     /**
      * Get per-game statistics for the authenticated athlete.
      */
+    /**
+     * Get per-game statistics for the authenticated athlete.
+     */
     public function getMyGameStats(Request $request)
     {
         $user = $request->user();
@@ -155,6 +158,49 @@ class AtletaController extends Controller
         $stats = \App\Models\AtletaJogoStat::where('atleta_id', $atleta->id)
             ->with(['jogo'])
             ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $stats
+        ]);
+    }
+
+    /**
+     * Get per-game statistics for a specific athlete (for trainers).
+     */
+    public function getAthleteGameStats(Request $request, $id)
+    {
+        $user = $request->user();
+        if (!$user) {
+             return response()->json(['success' => false, 'message' => 'Não autenticado'], 401);
+        }
+
+        $atleta = Atleta::find($id);
+        if (!$atleta) {
+            return response()->json(['success' => false, 'message' => 'Atleta não encontrado'], 404);
+        }
+
+        // Check permissions
+        $authorized = false;
+        if (in_array($user->tipo, ['admin', 'root'])) {
+            $authorized = true;
+        } elseif ($user->tipo === 'treinador') {
+            $treinador = \App\Models\Treinador::where('user_id', $user->id)->first();
+            if ($treinador && $treinador->equipa_id === $atleta->equipa_id) {
+                $authorized = true;
+            }
+        } elseif ($user->tipo === 'atleta' && $atleta->user_id === $user->id) {
+            $authorized = true;
+        }
+
+        if (!$authorized) {
+            return response()->json(['success' => false, 'message' => 'Não autorizado'], 403);
+        }
+
+        $stats = \App\Models\AtletaJogoStat::where('atleta_id', $atleta->id)
+            ->with(['jogo'])
+            ->orderBy('created_at', 'asc') // Ascending for chart progression
             ->get();
 
         return response()->json([
