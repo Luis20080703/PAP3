@@ -106,7 +106,7 @@
 
             <!-- BOTÃO -->
             <div class="btn-container">
-                <a href="https://homuncular-uncredentialed-heide.ngrok-free.dev"
+                <a href="{{ config('app.frontend_url') }}"
                    style="
                     display: inline-block;
                     width: 10em;
