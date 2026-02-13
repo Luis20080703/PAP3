@@ -5,7 +5,6 @@ import { Dashboard } from './components/Dashboard';
 import { Toaster } from './components/ui/sonner';
 import { AppProvider, useApp } from './context/AppContext';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
-import { ServerConfig } from './components/ServerConfig';
 
 import { PremiumPage } from './components/PremiumPage';
 import { PendingApproval } from './components/PendingApproval';
@@ -82,7 +81,6 @@ function AppContent() {
         <PremiumPage onBack={() => setCurrentPage('dashboard')} />
       )}
       <PWAInstallPrompt />
-      <ServerConfig />
       <Toaster />
     </div>
   );

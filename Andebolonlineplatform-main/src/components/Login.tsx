@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Tabs, TabsContent } from './ui/tabs';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApp } from '../context/AppContext';
 import { UserType } from '../types';
@@ -45,6 +45,9 @@ export function Login({ onBack }: LoginProps) {
   const [registerCipa, setRegisterCipa] = useState(''); // New state for registration
   const [escaloes, setEscaloes] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('login');
+
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   // Carregar equipas ao montar o componente
   useEffect(() => {
@@ -214,16 +217,26 @@ export function Login({ onBack }: LoginProps) {
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                 />
-                <input
-                  required
-                  className="login-input"
-                  type="password"
-                  name="password"
-                  id="login-password"
-                  placeholder="Password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                />
+                <div className="password-container">
+                  <input
+                    required
+                    className="login-input"
+                    type={showLoginPassword ? "text" : "password"}
+                    name="password"
+                    id="login-password"
+                    placeholder="Password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    tabIndex={-1}
+                  >
+                    {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
 
 
                 <button
@@ -259,14 +272,24 @@ export function Login({ onBack }: LoginProps) {
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
                 />
-                <input
-                  required
-                  className="login-input"
-                  type="password"
-                  placeholder="Password"
-                  value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
-                />
+                <div className="password-container">
+                  <input
+                    required
+                    className="login-input"
+                    type={showRegisterPassword ? "text" : "password"}
+                    placeholder="Password"
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                    tabIndex={-1}
+                  >
+                    {showRegisterPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
 
                 <select
                   value={equipa}

@@ -14,7 +14,7 @@ const mapUserType = (laravelType: string): 'atleta' | 'treinador' => {
 
 // ✅ URL CENTRALIZADA DO SERVIDOR - DINÂMICA
 const getAPIBaseURL = () => {
-  // ✅ Piority: Environment Variable (for production/ngrok)
+  // ✅ Priority: Environment Variable (for production/ngrok)
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
@@ -32,6 +32,12 @@ const getAPIBaseURL = () => {
 
   // ✅ DETECÇÃO AUTOMÁTICA
   const hostname = window.location.hostname;
+
+  // ✅ CAPACITOR APP (APK instalado) - usa IP da rede local
+  if (hostname === 'localhost' && window.location.protocol === 'capacitor:') {
+    console.log('📱 App Capacitor detectada - usando IP da rede');
+    return 'http://192.168.1.107:8000/api';
+  }
 
   // Se estiver a usar ngrok, usar caminho relativo (via proxy do Vite)
   if (hostname.includes('ngrok') || hostname.includes('loca.lt')) {
@@ -52,6 +58,7 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'ngrok-skip-browser-warning': 'true', // ✅ Ignorar aviso do ngrok para a API
   };
 
   if (options.headers) {
@@ -79,18 +86,8 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
       ...options,
     });
   } catch (networkError) {
-    // Network-level error (server down / connection refused)
-    console.error('Network error when calling API:', networkError);
-    try {
-      // Redirect user to a helpful static page explaining the backend is down
-      if (typeof window !== 'undefined' && window.location) {
-        window.location.href = '/server-down.html';
-      }
-    } catch (e) {
-      // ignore redirect errors in non-browser contexts
-    }
-
-    // Re-throw so callers can handle if needed (or the redirect will occur)
+    // Silently log and re-throw
+    console.error('API Connection Error:', networkError);
     throw networkError;
   }
 
